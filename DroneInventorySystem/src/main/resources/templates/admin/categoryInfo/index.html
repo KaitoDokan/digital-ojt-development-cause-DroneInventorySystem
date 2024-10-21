@@ -1,14 +1,21 @@
 <!DOCTYPE html>
-<html 
-	xmlns:th="http://www.thymeleaf.org"
-	th:replace="~{layout/template :: layout(~{::title},~{::body/content()})}"
->
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/template :: layout(~{::title},~{::body/content()})}">
+
 <head>
 	<title>InvenTrack</title>
 </head>
 
 <body>
-HelloWorld
+	分類情報管理<br>
+	<br>
+
+	<table th:each="categoryInfo:${categories}"
+	border="1" align="center" width="500">
+		<tr>
+			<td align="center"
+			th:text="${categoryInfo.name}"></td>
+		</tr>
+	</table>
 </body>
 
 </html>

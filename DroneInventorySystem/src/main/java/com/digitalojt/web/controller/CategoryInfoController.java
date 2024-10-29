@@ -63,26 +63,22 @@ public class CategoryInfoController extends AbstractController {
 
 		//検索結果に入力値を表示するためのセット
 		model.addAttribute("input_categoryName", form.getCategoryName());
+		//検索結果を表示するためにあらかじめ生成
+		List<CategoryInfo> categoryInfoList;
 		// Valid項目チェック
 		if (bindingResult.hasErrors()) {
-
 			// エラーメッセージをプロパティファイルから取得
 			String errorMsg = MessageManager.getMessage(messageSource,
 					bindingResult.getGlobalError().getDefaultMessage());
 			model.addAttribute("errorMsg", errorMsg);
-
 			// 分類情報画面に表示するデータを全件取得 検索失敗
-			List<CategoryInfo> categoryInfoList = categoryInfoService.getCategoryInfoData();
-			//modelに分類情報定数クラスをセット
-			model.addAttribute("categoryInfoList", categoryInfoList);
-			return "admin/categoryInfo/index";
+			categoryInfoList = categoryInfoService.getCategoryInfoData();
+		} else {
+			// 分類情報画面に表示するデータを取得 検索成功
+			categoryInfoList = categoryInfoService.getCategoryInfoData(form.getCategoryName());
 		}
-
-		// 分類情報画面に表示するデータを取得 検索成功
-		List<CategoryInfo> categoryInfoList = categoryInfoService.getCategoryInfoData(form.getCategoryName());
-		// 画面表示用に商品情報リストをセット
+		// 画面表示用に検索結果をセット
 		model.addAttribute("categoryInfoList", categoryInfoList);
-
 		return "admin/categoryInfo/index";
 	}
 }

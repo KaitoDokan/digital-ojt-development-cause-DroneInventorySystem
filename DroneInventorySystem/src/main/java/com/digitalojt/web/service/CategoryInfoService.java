@@ -30,10 +30,7 @@ public class CategoryInfoService {
 	 * @return
 	 */
 	public List<CategoryInfo> getCategoryInfoData() {
-
-		// 分類情報作成
-		List<CategoryInfo> categoryInfoList = createCategoryInfo();
-
+		List<CategoryInfo> categoryInfoList = repository.findAll();
 		return categoryInfoList;
 	}
 

@@ -1,11 +1,9 @@
 package com.digitalojt.web.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.digitalojt.web.consts.CategoryInfoConsts;
 import com.digitalojt.web.entity.CategoryInfo;
 import com.digitalojt.web.repository.CategoryInfoRepository;
 
@@ -42,98 +40,8 @@ public class CategoryInfoService {
 	 * @return 
 	 */
 	public List<CategoryInfo> getCategoryInfoData(String categoryName) {
-
-		// 分類情報作成
-		List<CategoryInfo> categoryInfoList = createCategoryInfo();
-
-		// 検索処理
-		categoryInfoList = searchCategoryInfoData(categoryInfoList, categoryName);
-
+		// リポジトリを用いて検索、セット
+		List<CategoryInfo> categoryInfoList = repository.findByCategoryName(categoryName);
 		return categoryInfoList;
 	}
-
-	/**
-	 * 検索処理
-	 * 
-	 * @param categoryInfoList
-	 * @param categoryName
-	 * @return
-	 */
-	private List<CategoryInfo> searchCategoryInfoData(List<CategoryInfo> categoryInfoList,
-			String categoryName) {
-
-		List<CategoryInfo> hitCategoryInfoList = new ArrayList<>();
-
-		// 引数の文字列と合致する要素のみリストに追加
-		categoryInfoList.forEach(item -> {
-			if (categoryName.equals(item.getCategoryName())) {
-				hitCategoryInfoList.add(item);
-			}
-		});
-
-		return hitCategoryInfoList;
-	}
-
-	/**
-	 * 分類情報作成
-	 * 
-	 * @return
-	 */
-	private List<CategoryInfo> createCategoryInfo() {
-
-		List<CategoryInfo> categoryInfoList = new ArrayList<>();
-
-		// 1コード目作成
-		CategoryInfo categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.FRAME);
-		categoryInfoList.add(categoryInfo);
-
-		// 2コード目作成
-		categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.PROPELLER);
-		categoryInfoList.add(categoryInfo);
-
-		// 3コード目作成
-		categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.ELECTRIC_MOTOR);
-		categoryInfoList.add(categoryInfo);
-
-		// 4コード目作成
-		categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.ELECTRIC_SPEED_CONTROLLER);
-		categoryInfoList.add(categoryInfo);
-
-		// 5コード目作成
-		categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.BATTERY);
-		categoryInfoList.add(categoryInfo);
-
-		// 6コード目作成
-		categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.FLIGHT_CONTROLLER);
-		categoryInfoList.add(categoryInfo);
-
-		// 7コード目作成
-		categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.REMOTE_CONTROLLER);
-		categoryInfoList.add(categoryInfo);
-
-		// 8コード目作成
-		categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.RECEIVER);
-		categoryInfoList.add(categoryInfo);
-
-		// 9コード目作成
-		categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.GPS_MODULE);
-		categoryInfoList.add(categoryInfo);
-
-		// 10コード目作成
-		categoryInfo = new CategoryInfo();
-		categoryInfo.setCategoryName(CategoryInfoConsts.CAMERA_SENSOR);
-		categoryInfoList.add(categoryInfo);
-
-		return categoryInfoList;
-	}
-
 }

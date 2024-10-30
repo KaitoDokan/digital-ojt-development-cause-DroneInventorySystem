@@ -45,7 +45,7 @@ public class CategoryInfoController extends AbstractController {
 		// 分類情報画面に表示するデータを全件取得
 		List<CategoryInfo> categoryInfoList = categoryInfoService.getCategoryInfoData();
 
-		//modelに分類情報定数クラスをセット
+		//modelに全件取得したリストをセット
 		model.addAttribute("categoryInfoList", categoryInfoList);
 
 		return "admin/categoryInfo/index";

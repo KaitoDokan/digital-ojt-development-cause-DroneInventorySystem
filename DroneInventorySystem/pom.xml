@@ -103,6 +103,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- PasswordEncoder(Spring Security) -->					
+		<dependency>			
+			<groupId>org.springframework.security</groupId>		
+			<artifactId>spring-security-core</artifactId>		
+		</dependency>			
+
 	</dependencies>
 
 	<build>

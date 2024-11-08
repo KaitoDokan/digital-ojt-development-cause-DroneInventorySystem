@@ -42,11 +42,14 @@ public class WebSecurityConfig {
 
 		// LoginController呼び出し
 		http
-				.authorizeHttpRequests(authz -> authz.requestMatchers(UrlConsts.NO_AUTHENTICATION).permitAll()
+				.authorizeHttpRequests(authz -> authz
+						.requestMatchers(UrlConsts.NO_AUTHENTICATION).permitAll()
+						.requestMatchers("/css/", "/js/", "/images/**").permitAll()
 						.anyRequest().authenticated())
 				.formLogin(login -> login.loginPage(UrlConsts.LOGIN)//ログインページへの遷移
 						.loginProcessingUrl(UrlConsts.AUTHENTICATE)//ログインフォームのPOST送信先URL
 						.defaultSuccessUrl(UrlConsts.STOCK_LIST)//ログイン成功時のリダイレクト先
+						.failureUrl(UrlConsts.LOGIN + "?error=true")//認証失敗時のリダイレクト先
 						.usernameParameter("adminId"))
 				.logout(logout -> logout
 						.logoutSuccessUrl(UrlConsts.LOGIN)

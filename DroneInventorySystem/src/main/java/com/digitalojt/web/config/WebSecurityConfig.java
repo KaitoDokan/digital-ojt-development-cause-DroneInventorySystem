@@ -44,7 +44,7 @@ public class WebSecurityConfig {
 		http
 				.authorizeHttpRequests(authz -> authz
 						.requestMatchers(UrlConsts.NO_AUTHENTICATION).permitAll()
-						.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+						.requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
 						.anyRequest().authenticated())
 				.formLogin(login -> login.loginPage(UrlConsts.LOGIN)//ログインページへの遷移
 						.loginProcessingUrl(UrlConsts.AUTHENTICATE)//ログインフォームのPOST送信先URL

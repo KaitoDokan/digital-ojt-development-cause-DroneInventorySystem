@@ -13,7 +13,7 @@ import jakarta.validation.ConstraintValidatorContext;
 /**
  * 在庫センター情報画面のバリデーションチェック 実装クラス
  * 
- * @author your name
+ * @author KaitoDokan
  */
 public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterInfoFormValidator, CenterInfoForm> {
 
@@ -46,7 +46,7 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 			}
 
 			// 文字数チェック
-			if (form.getCenterName().length() > SearchParams.MAX_LENGTH) {
+			if (form.getCenterName().length() > SearchParams.CENTER_MAX_LENGTH) {
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(ErrorMessage.CENTER_NAME_LENGTH_ERROR_MESSAGE)
 						.addConstraintViolation();

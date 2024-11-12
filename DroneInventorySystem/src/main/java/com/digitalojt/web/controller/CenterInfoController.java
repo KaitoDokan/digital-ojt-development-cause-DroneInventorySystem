@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * 在庫センター情報画面のコントローラークラス
  * 
- * @author your name
+ * @author KaitoDokan
  *
  */
 @Controller

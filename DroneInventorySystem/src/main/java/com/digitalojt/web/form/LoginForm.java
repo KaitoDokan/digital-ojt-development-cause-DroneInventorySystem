@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * ログイン画面のフォームクラス
  * 
- * @author your name
+ * @author KaitoDokan
  *
  */
 @Data

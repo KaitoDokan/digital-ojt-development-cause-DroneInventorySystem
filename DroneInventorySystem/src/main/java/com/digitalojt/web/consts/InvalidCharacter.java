@@ -3,7 +3,7 @@ package com.digitalojt.web.consts;
 /**
  * 不正文字を管理するEnumクラス
  * 
- * @author your name
+ * @author KaitoDokan
  */
 public enum InvalidCharacter {
 
@@ -16,7 +16,9 @@ public enum InvalidCharacter {
     SEMICOLON(';'),
     DOLLAR_SIGN('$'),
     QUESTION_MARK('?'),
-    ASTERISK('*');
+    ASTERISK('*'),
+    SINGLE_QUOTE('\''),
+    HALF_SPACE(' ');
 
     private final char character;
 

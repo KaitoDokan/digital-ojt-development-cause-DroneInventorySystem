@@ -11,7 +11,7 @@ import lombok.Setter;
 /**
  * センター情報Entity
  * 
- * @author your name
+ * @author KaitoDokan
  *
  */
 @Data

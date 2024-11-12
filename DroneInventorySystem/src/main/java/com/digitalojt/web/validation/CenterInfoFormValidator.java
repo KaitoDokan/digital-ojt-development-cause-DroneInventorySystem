@@ -13,7 +13,7 @@ import jakarta.validation.Payload;
 /**
  * 在庫センター情報画面のバリデーションチェック インターフェース
  * 
- * @author your name
+ * @author KaitoDokan
  */
 @Constraint(validatedBy = CenterInfoFormValidatorImpl.class)
 @Target({ ElementType.TYPE })

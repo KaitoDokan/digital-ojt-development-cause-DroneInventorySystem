@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * 在庫センター情報画面のフォームクラス
  * 
- * @author your name
+ * @author KaitoDokan
  *
  */
 @Data

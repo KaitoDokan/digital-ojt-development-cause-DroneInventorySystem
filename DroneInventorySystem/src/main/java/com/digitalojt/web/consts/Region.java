@@ -3,7 +3,7 @@ package com.digitalojt.web.consts;
 /**
  * 都道府県 Enumクラス
  * 
- * @author your name
+ * @author KaitoDokan
  */
 public enum Region {
 

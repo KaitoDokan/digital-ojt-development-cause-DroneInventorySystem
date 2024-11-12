@@ -7,7 +7,7 @@ import com.digitalojt.web.consts.InvalidCharacter;
 /**
  * パラメーターチェックに関する処理を行うクラス
  * 
- * @author your name
+ * @author KaitoDokan
  *
  */
 public class ParmCheckUtil {

@@ -29,8 +29,21 @@ public class StockInfoService {
 	 */
 	public List<StockInfo> getStockInfoData() {
 		List<StockInfo> stockInfoList = repository.findAll();
-		System.out.println(stockInfoList);
 		return stockInfoList;
 	}
 
+	/**
+	 * 引数に合致する分類情報を取得
+	 * 
+	 * @param categoryId
+	 * @param stockName
+	 * @param amount
+	 * @param isAboveOrBelowFlag
+	 * @return 
+	 */
+	public List<StockInfo> getStockInfoData(Integer categoryId,String stockName,Integer amount,Integer isAboveOrBelowFlag) {
+		// リポジトリを用いて検索、セット
+		List<StockInfo> stockInfoList = repository.findByCategoryIdAndStockNameAndAmount(categoryId,stockName,amount,isAboveOrBelowFlag);
+		return stockInfoList;
+	}
 }

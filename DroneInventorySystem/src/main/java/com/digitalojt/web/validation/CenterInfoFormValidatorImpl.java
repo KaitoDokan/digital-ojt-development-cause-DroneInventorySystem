@@ -5,7 +5,7 @@ import org.thymeleaf.util.StringUtils;
 import com.digitalojt.web.consts.ErrorMessage;
 import com.digitalojt.web.consts.SearchParams;
 import com.digitalojt.web.form.CenterInfoForm;
-import com.digitalojt.web.util.ParmCheckUtil;
+import com.digitalojt.web.util.ParamCheckUtil;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -38,7 +38,7 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 		if (form.getCenterName() != null) {
 
 			// 不正文字列チェック
-			if (ParmCheckUtil.isParameterInvalid(form.getCenterName())) {
+			if (ParamCheckUtil.isParameterInvalid(form.getCenterName())) {
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(ErrorMessage.INVALID_INPUT_ERROR_MESSAGE)
 						.addConstraintViolation();
@@ -58,7 +58,7 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 		if (form.getRegion() != null) {
 
 			// 不正文字列チェック
-			if (ParmCheckUtil.isParameterInvalid(form.getRegion())) {
+			if (ParamCheckUtil.isParameterInvalid(form.getRegion())) {
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(ErrorMessage.INVALID_INPUT_ERROR_MESSAGE)
 						.addConstraintViolation();

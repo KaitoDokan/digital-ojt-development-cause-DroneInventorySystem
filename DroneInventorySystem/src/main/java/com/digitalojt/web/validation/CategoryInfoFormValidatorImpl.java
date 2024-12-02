@@ -5,7 +5,7 @@ import org.thymeleaf.util.StringUtils;
 import com.digitalojt.web.consts.ErrorMessage;
 import com.digitalojt.web.consts.SearchParams;
 import com.digitalojt.web.form.CategoryInfoForm;
-import com.digitalojt.web.util.ParmCheckUtil;
+import com.digitalojt.web.util.ParamCheckUtil;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -37,7 +37,7 @@ public class CategoryInfoFormValidatorImpl implements ConstraintValidator<Catego
 		if (form.getCategoryName() != null) {
 
 			// 不正文字列チェック
-			if (ParmCheckUtil.isParameterInvalid(form.getCategoryName())) {
+			if (ParamCheckUtil.isParameterInvalid(form.getCategoryName())) {
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(ErrorMessage.INVALID_INPUT_ERROR_MESSAGE)
 						.addConstraintViolation();

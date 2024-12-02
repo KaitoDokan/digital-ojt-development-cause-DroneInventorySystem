@@ -62,7 +62,7 @@ public class CategoryInfoController extends AbstractController {
 	public String search(Model model, @Valid CategoryInfoForm form, BindingResult bindingResult) {
 
 		//検索結果に入力値を表示するためのセット
-		model.addAttribute("input_categoryName", form.getCategoryName());
+		model.addAttribute("inputtedCategoryName", form.getCategoryName());
 		//検索結果を表示するためにあらかじめ生成
 		List<CategoryInfo> categoryInfoList;
 		// Valid項目チェック

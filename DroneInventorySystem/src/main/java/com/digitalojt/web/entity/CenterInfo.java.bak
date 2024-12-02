@@ -75,4 +75,5 @@ public class CenterInfo {
 	 * 更新日
 	 */
 	private Timestamp updateDate;
+
 }

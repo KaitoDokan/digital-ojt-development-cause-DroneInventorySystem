@@ -24,8 +24,13 @@ public class ErrorMessage {
 	public static final String INVALID_INPUT_ERROR_MESSAGE = "invalid.input";
 
 	// 文字超過に関するエラーメッセージ センター情報
-	public static final String CENTER_NAME_LENGTH_ERROR_MESSAGE = "centerName.length.wrongInput";
+	public static final String CENTER_NAME_LENGTH_ERROR_MESSAGE = "centerName.length.input";
 
 	// 文字超過に関するエラーメッセージ 分類情報
-	public static final String CATEGORY_NAME_LENGTH_ERROR_MESSAGE = "categoryName.length.wrongInput";
+	public static final String CATEGORY_NAME_LENGTH_ERROR_MESSAGE = "categoryName.length.input";
+
+	// 半角数字以外が入力されたときに関するエラーメッセージ
+	public static final String NON_NUMERIC_INPUT_ERROR_MESSAGE = "non.numeric.input";
+
+
 }

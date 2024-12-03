@@ -51,6 +51,11 @@ public class LoginController {
 		
 		// エラーメッセージをプロパティファイルから取得
 		Exception errorInfo = (Exception) session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+		
+		if(errorInfo == null) {
+			return "admin/login/index";
+		}
+		
 		model.addAttribute("errorMsg", errorInfo.getMessage());
 		return "admin/login/index";
 	}

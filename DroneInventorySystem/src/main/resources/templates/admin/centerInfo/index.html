@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html
-  xmlns:th="http://www.thymeleaf.org"
-  th:replace="~{layout/template :: layout(~{::title},~{::body/content()})}"
->
-  <head>
-    <title>InvenTrack</title>
-  </head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/template :: layout(~{::title},~{::body/content()})}">
 
-  <body>
+<head>
+	<title>InvenTrack</title>
+</head>
+
+<body>
 	<div class="card shadow mb-4">
 
 		<div class="card-header py-3">
@@ -15,32 +13,32 @@
 		</div>
 
 		<div class="card-body">
-			
+
 			<!-- 検索フォーム -->
 			<div class="search-container">
-				<form class="form-inline" method="post" th:action="@{'/admin/centerInfo/search'}" th:object="${CenterInfoForm}">
+				<form class="form-inline" method="post" th:action="@{'/admin/centerInfo/search'}"
+					th:object="${CenterInfoForm}">
 					<label for="searchTerm" class="mr-2">検索条件</label>
-					
+
 					<label for="searchTerm" class="mr-2">センター名</label>
- 					<input type="text" id="searchTerm" name="centerName" class="form-control mr-2">
- 					
- 					<label for="searchTerm" class="mr-2">都道府県</label>
- 					<select id="searchTerm" name="region" class="form-control mr-2">
-						 <option value="">選択してください</option>
-						 <option th:each="region : ${regions}" 
-						 	th:value="${region.name}" 
-						 	th:text="${region.name}"></option>
+					<input type="text" id="searchTerm" name="centerName" class="form-control mr-2">
+
+					<label for="searchTerm" class="mr-2">地域</label>
+					<select id="searchTerm" name="region" class="form-control mr-2">
+						<option value="">選択してください</option>
+						<option th:each="region : ${regions}" th:value="${region.name}" th:text="${region.name}">
+						</option>
 					</select>
-					
- 					<button type="submit" class="btn btn-primary">検索</button>
- 				</form>
- 				
- 				<!-- エラーメッセージの表示 -->
- 				<div th:if="${errorMsg != null}" class="text-danger">
-					 <p th:text="${errorMsg}"></p>
+
+					<button type="submit" class="btn btn-primary">検索</button>
+				</form>
+
+				<!-- エラーメッセージの表示 -->
+				<div th:if="${errorMsg != null}" class="text-danger">
+					<p th:text="${errorMsg}"></p>
 				</div>
 			</div>
- 			
+
 			<!-- 在庫センター情報テーブル -->
 			<div class="table-responsive">
 				<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -64,5 +62,6 @@
 			</div>
 		</div>
 	</div>
-  </body>
+</body>
+
 </html>

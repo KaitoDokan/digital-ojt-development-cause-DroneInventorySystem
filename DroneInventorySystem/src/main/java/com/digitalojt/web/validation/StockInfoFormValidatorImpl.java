@@ -18,58 +18,48 @@ public class StockInfoFormValidatorImpl implements ConstraintValidator<StockInfo
 	 * バリデーションチェック
 	 */
 	@Override
+	//	public boolean isValid(StockInfoForm form, ConstraintValidatorContext context) {
+
 	public boolean isValid(StockInfoForm form, ConstraintValidatorContext context) {
 
-	    boolean allFieldsEmpty = (form.getCategoryId() == null) &&
-	            (form.getStockName() == null || form.getStockName().isEmpty())
-	            &&(form.getAmount() == null)
-	            ;
-	    
-		// すべてのフィールドが空かをチェック
-		if (allFieldsEmpty) {
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(ErrorMessage.ALL_FIELDS_EMPTY_ERROR_MESSAGE)
-					.addConstraintViolation();
+		//すべてのフィールドが空かをチェック
+		if (areAllFieldsEmpty(form)) {
+			setErrorMessage(context, ErrorMessage.ALL_FIELDS_EMPTY_ERROR_MESSAGE);
 			return false;
 		}
 
-		// カテゴリIDのチェック
-		// 半角数字かどうかチェック
+		//分類IDに不正入力があるかをチェック
 		if (ParamCheckUtil.isNumeric(form.getCategoryId())) {
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE)
-					.addConstraintViolation();
-			return false;
+			setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
 		}
 
-		// 在庫名のチェック
-		// 不正文字列チェック
+		//在庫名に不正入力があるかをチェック
 		if (ParamCheckUtil.isParameterInvalid(form.getStockName())) {
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(ErrorMessage.INVALID_INPUT_ERROR_MESSAGE)
-					.addConstraintViolation();
-			return false;
-		}
-		
-		// 数量のチェック
-		// 半角数字かどうかチェック
-		if (ParamCheckUtil.isNumeric(form.getAmount())) {
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE)
-					.addConstraintViolation();
-			return false;
-		}
-		
-		// 以上以下フラグのチェック
-		// 半角数字かどうかチェック
-		if (ParamCheckUtil.isNumeric(form.getIsAboveOrBelowFlag())) {
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE)
-					.addConstraintViolation();
-			return false;
+			setErrorMessage(context, ErrorMessage.INVALID_INPUT_ERROR_MESSAGE);
 		}
 
-		// その他のバリデーションに問題なければtrueを返す
+		//数量に不正入力があるかをチェック
+		if (ParamCheckUtil.isNumeric(form.getAmount())) {
+			setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+		}
+
+		//以上以下フラグに不正入力があるかをチェック
+		if (ParamCheckUtil.isNumeric(form.getIsAboveOrBelowFlag())) {
+			setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+		}
+
 		return true;
+	}
+
+	private boolean areAllFieldsEmpty(StockInfoForm form) {
+		return (form.getCategoryId() == null) &&
+				(form.getStockName() == null || form.getStockName().isEmpty()) &&
+				(form.getAmount() == null);
+	}
+
+	private void setErrorMessage(ConstraintValidatorContext context, String errorMessage) {
+		context.disableDefaultConstraintViolation();
+		context.buildConstraintViolationWithTemplate(errorMessage)
+				.addConstraintViolation();
 	}
 }

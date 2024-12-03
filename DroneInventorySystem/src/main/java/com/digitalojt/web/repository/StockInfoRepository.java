@@ -18,7 +18,7 @@ import com.digitalojt.web.entity.StockInfo;
 public interface StockInfoRepository extends JpaRepository<StockInfo, Integer> {
 
 	@Query("SELECT s FROM StockInfo s WHERE s.deleteFlag = '0'")
-	List<StockInfo> findAll();
+	List<StockInfo> findAll();//全件取得
 
 	/**
 	 * 引数に合致する在庫情報を取得
@@ -41,4 +41,13 @@ public interface StockInfoRepository extends JpaRepository<StockInfo, Integer> {
 			String stockName,
 			Integer amount,
 			Integer isAboveOrBelowFlag);
+
+	/**
+	 * 引数に合致する在庫情報を取得
+	 * 
+	 * @param categoryId
+	 * @return paramで検索した結果
+	 */
+	List<StockInfo> findByCategoryInfo_CategoryId(Integer categoryId);
+
 }

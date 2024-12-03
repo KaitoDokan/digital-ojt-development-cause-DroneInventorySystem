@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.digitalojt.web.filter.LogSettingFilter;
 
+//ログセッティングフィルターを使用可能にするための設定
 @Configuration
 public class LogConfig {
 	@Bean

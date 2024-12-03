@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.slf4j.MDC;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.digitalojt.web.consts.LogMessage;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -38,16 +40,16 @@ public class LogSettingFilter implements Filter {
 
 		try {
 			// IPアドレスを設定
-			MDC.put("ipAddress", servletRequest.getRemoteAddr());
+			MDC.put(LogMessage.IP_ADDRESS_KEY, servletRequest.getRemoteAddr());
 
 			// ユーザーIDを設定
 			String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-			MDC.put("userId", userId);
+			MDC.put(LogMessage.USER_ID_KEY, userId);
 			filterChain.doFilter(servletRequest, servletResponse);
 		} finally {
-		    // MDCからキーを削除
-		    MDC.remove("ipAddress");
-		    MDC.remove("userId");
+			// MDCからキーを削除
+			MDC.remove(LogMessage.IP_ADDRESS_KEY);
+			MDC.remove(LogMessage.USER_ID_KEY);
 		}
 	}
 

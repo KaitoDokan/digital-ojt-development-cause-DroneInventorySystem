@@ -7,6 +7,13 @@ package com.digitalojt.web.consts;
  *
  */
 public class LogMessage {
+
+	//IPアドレス
+	public static final String IP_ADDRESS_KEY = "ipAddress";
+
+	//ユーザーID
+	public static final String USER_ID_KEY = "userId";
+
 	//アクセスログ
 	//ACCESSだけ表示される
 	public static final String ACCESS_LOG = "ACCESS";

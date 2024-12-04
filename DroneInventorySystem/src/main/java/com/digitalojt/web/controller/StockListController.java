@@ -54,7 +54,6 @@ public class StockListController extends AbstractController {
 		try {
 			// 共通データをサービスから取得
 			StockListViewData data = stockInfoService.getStockListViewData(form);
-
 			//取得に失敗していればエラー
 			if (data == null) {
 				throw new RuntimeException("データの取得に失敗しました");
@@ -67,7 +66,6 @@ public class StockListController extends AbstractController {
 			//L2出力
 			logger.error(String.format(LogMessage.ERROR_LOG, "GET", "stockListView", e));
 		}
-
 		//L3出力
 		logger.info(String.format(LogMessage.APP_LOG, "GET", "stockListView", "END"));
 		return "admin/stockList/index";
@@ -88,31 +86,28 @@ public class StockListController extends AbstractController {
 		//L3出力
 		logger.info(String.format(LogMessage.APP_LOG, "POST", "search", "START"));
 
+		StockListViewData data;
 		try {
-			// 共通データをサービスから取得
-			StockListViewData data = stockInfoService.getStockListViewData(form);
-
-			//取得に失敗していればエラー
-			if (data == null) {
-				throw new RuntimeException("データの取得に失敗しました");
-			}
-
 			// Valid項目チェック
 			if (bindingResult.hasErrors()) {
 				// エラーメッセージをプロパティファイルから取得
 				String errorMsg = MessageManager.getMessage(messageSource,
 						bindingResult.getGlobalError().getDefaultMessage());
 				model.addAttribute("errorMsg", errorMsg);
-				throw new RuntimeException(errorMsg);
+				data = stockInfoService.getStockListViewData(new StockInfoForm()); // フォームの入力なしで全件取得
+				//L2出力
+				logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search-ValidError",form));
+//負の数を入力した場合保持がリセットされる。いい実装がなければ仕様変更
+//amountに999999999999等入れた場合、nullが返されてしまいバリデーションエラーとならない
 			} else {
 				//フォームに入力された情報から検索、再セット
+				data = stockInfoService.getStockListViewData(form);
 				data.setSelectStockInfoList(stockInfoService.getStockInfoData(form.getCategoryId()));
-				data.setStockInfoList(stockInfoService.getStockInfoData(form));
 			}
 			//共通データをmodelにセット
 			stockInfoService.setCommonModelAttributes(model, data);
 
-		} catch (RuntimeException e) {
+		} catch (Exception e) {
 			//L2出力
 			logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search", e));
 		}

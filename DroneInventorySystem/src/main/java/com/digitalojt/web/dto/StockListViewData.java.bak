@@ -14,4 +14,5 @@ public class StockListViewData {
 	private List<StockInfo> stockInfoList;// 在庫一覧データ
 	private List<StockInfo> selectStockInfoList; // プルダウン用在庫データ
 	private List<CategoryInfo> categories; // 分類情報プルダウン
+
 }

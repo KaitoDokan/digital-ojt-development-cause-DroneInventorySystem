@@ -18,45 +18,80 @@ public class StockInfoFormValidatorImpl implements ConstraintValidator<StockInfo
 	 * バリデーションチェック
 	 */
 	@Override
-	//	public boolean isValid(StockInfoForm form, ConstraintValidatorContext context) {
-
 	public boolean isValid(StockInfoForm form, ConstraintValidatorContext context) {
 
-		//すべてのフィールドが空かをチェック
+		// すべてのフィールドが空かをチェック
 		if (areAllFieldsEmpty(form)) {
 			setErrorMessage(context, ErrorMessage.ALL_FIELDS_EMPTY_ERROR_MESSAGE);
 			return false;
 		}
 
-		//分類IDに不正入力があるかをチェック
-		if (ParamCheckUtil.isNumeric(form.getCategoryId())) {
-			setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+		// 分類IDのチェック
+		if (form.getCategoryId() != null) {
+
+			//半角数字チェック
+			if (ParamCheckUtil.isNumeric(form.getCategoryId())) {
+				setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+				return false;
+			}
 		}
 
-		//在庫名に不正入力があるかをチェック
-		if (ParamCheckUtil.isParameterInvalid(form.getStockName())) {
-			setErrorMessage(context, ErrorMessage.INVALID_INPUT_ERROR_MESSAGE);
+		// 在庫名のチェック
+		if (form.getStockName() != null) {
+
+			//不正文字列チェック
+			if (ParamCheckUtil.isParameterInvalid(form.getStockName())) {
+				setErrorMessage(context, ErrorMessage.INVALID_INPUT_ERROR_MESSAGE);
+				return false;
+			}
 		}
 
-		//数量に不正入力があるかをチェック
-		if (ParamCheckUtil.isNumeric(form.getAmount())) {
-			setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+		// 数量のチェック
+		if (form.getAmount() != null) {
+
+			//半角数字チェック
+			if (ParamCheckUtil.isNumeric(form.getAmount())) {
+				setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+				return false;
+			}
+			// 数値の範囲をチェック
+			if (ParamCheckUtil.isWithinRange(form.getAmount())) {
+				setErrorMessage(context, ErrorMessage.UNEXPECTED_NUMBER_INPUT_ERROR_MESSAGE);
+				return false;
+			}
 		}
 
-		//以上以下フラグに不正入力があるかをチェック
+		// 以上以下フラグのチェック
+		if (form.getIsAboveOrBelowFlag() != null) {
+
+			//半角数字チェック
+			if (ParamCheckUtil.isNumeric(form.getIsAboveOrBelowFlag())) {
+				setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+				return false;
+			}
+		}
+
+		//半角数字チェック
 		if (ParamCheckUtil.isNumeric(form.getIsAboveOrBelowFlag())) {
 			setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+			return false;
 		}
 
 		return true;
 	}
 
+	/**
+	 * すべてのフィールドが空かどうかをチェック
+	 */
 	private boolean areAllFieldsEmpty(StockInfoForm form) {
 		return (form.getCategoryId() == null) &&
 				(form.getStockName() == null || form.getStockName().isEmpty()) &&
 				(form.getAmount() == null);
 	}
 
+	/**
+	 * エラーメッセージを設定する
+	 */
 	private void setErrorMessage(ConstraintValidatorContext context, String errorMessage) {
 		context.disableDefaultConstraintViolation();
 		context.buildConstraintViolationWithTemplate(errorMessage)

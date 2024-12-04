@@ -27,6 +27,19 @@ public class CenterInfoService {
 	/** センター情報テーブル リポジトリー */
 	private final CenterInfoRepository repository;
 
+	//	/**
+	//	 * 在庫センター情報を全件検索で取得
+	//	 * 
+	//	 * @return
+	//	 */
+	//	public List<CenterInfo> getCenterInfoData() {
+	//
+	//		// 在庫センター情報取得
+	//		List<CenterInfo> centerInfoList = repository.findAll();
+	//
+	//		return centerInfoList;
+	//	}
+
 	/**
 	 * 在庫センター情報をformによる検索で取得
 	 * 

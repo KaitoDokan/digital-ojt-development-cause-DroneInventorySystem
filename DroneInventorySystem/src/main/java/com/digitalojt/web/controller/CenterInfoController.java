@@ -1,8 +1,7 @@
 package com.digitalojt.web.controller;
 
-import java.util.Arrays;
-import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,9 +9,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.digitalojt.web.consts.Region;
+import com.digitalojt.web.consts.LogMessage;
 import com.digitalojt.web.consts.UrlConsts;
-import com.digitalojt.web.entity.CenterInfo;
+import com.digitalojt.web.dto.CenterListViewData;
 import com.digitalojt.web.form.CenterInfoForm;
 import com.digitalojt.web.service.CenterInfoService;
 import com.digitalojt.web.util.MessageManager;
@@ -36,6 +35,9 @@ public class CenterInfoController {
 	/** メッセージソース */
 	private final MessageSource messageSource;
 
+	/** ログ設定 */
+	private static Logger logger = LoggerFactory.getLogger("CenterInfo");
+
 	/**
 	 * 初期表示
 	 * 
@@ -43,20 +45,28 @@ public class CenterInfoController {
 	 * @return
 	 */
 	@GetMapping(UrlConsts.CENTER_INFO)
-	public String index(Model model) {
+	public String centerListView(Model model, CenterInfoForm form) {
+		//L1出力
+		logger.info(String.format(LogMessage.ACCESS_LOG));
+		//L3出力
+		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerListView", "START"));
 
-		// 在庫センター情報画面に表示するデータを取得
-		List<CenterInfo> centerInfoList = centerInfoService.getCenterInfoData();
+		try {
+			// 共通データをサービスから取得
+			CenterListViewData data = centerInfoService.getCenterListViewData(form);
+			//取得に失敗していればエラー
+			if (data == null) {
+				throw new RuntimeException("データの取得に失敗しました");
+			}
+			//共通データをmodelにセット
+			centerInfoService.setCommonModelAttributes(model, data);
 
-		// 画面表示用に商品情報リストをセット
-		model.addAttribute("centerInfoList", centerInfoList);
-
-		// 都道府県Enumをリストに変換
-		List<Region> regions = Arrays.asList(Region.values());
-
-		// 都道府県プルダウン情報をセット
-		model.addAttribute("regions", regions);
-
+		} catch (RuntimeException e) {
+			//L2出力
+			logger.error(String.format(LogMessage.ERROR_LOG, "GET", "centerListView", e));
+		}
+		//L3出力
+		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerListView", "END"));
 		return "admin/centerInfo/index";
 	}
 
@@ -70,33 +80,36 @@ public class CenterInfoController {
 	@PostMapping(UrlConsts.CENTER_INFO_SEARCH)
 	public String search(Model model, @Valid CenterInfoForm form, BindingResult bindingResult) {
 
-		// Valid項目チェック
-		if (bindingResult.hasErrors()) {
-			
-			// エラーメッセージをプロパティファイルから取得
-			String errorMsg = MessageManager.getMessage(messageSource, bindingResult.getGlobalError().getDefaultMessage());
-			model.addAttribute("errorMsg", errorMsg);
+		//L1出力
+		logger.info(String.format(LogMessage.ACCESS_LOG));
+		//L3出力
+		logger.info(String.format(LogMessage.APP_LOG, "POST", "search", "START"));
 
-			// 都道府県Enumをリストに変換
-			List<Region> regions = Arrays.asList(Region.values());
+		CenterListViewData data;
+		try {
+			// Valid項目チェック
+			if (bindingResult.hasErrors()) {
+				// エラーメッセージをプロパティファイルから取得
+				String errorMsg = MessageManager.getMessage(messageSource,
+						bindingResult.getGlobalError().getDefaultMessage());
+				model.addAttribute("errorMsg", errorMsg);
+				data = centerInfoService.getCenterListViewData(new CenterInfoForm());
+				//L2出力
+				logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search-ValidError", form+errorMsg));
+			} else {
+				//フォームに入力された情報から検索、再セット
+				data = centerInfoService.getCenterListViewData(form);
+			}
+			//共通データをmodelにセット
+			centerInfoService.setCommonModelAttributes(model, data);
 
-			// 都道府県プルダウン情報をセット
-			model.addAttribute("regions", regions);
-
-			return "admin/centerInfo/index";
+		} catch (Exception e) {
+			//L2出力
+			logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search", e));
 		}
 
-		// 在庫センター情報画面に表示するデータを取得
-		List<CenterInfo> centerInfoList = centerInfoService.getCenterInfoData(form.getCenterName(), form.getRegion());
-
-		// 画面表示用に商品情報リストをセット
-		model.addAttribute("centerInfoList", centerInfoList);
-
-		// 都道府県Enumをリストに変換
-		List<Region> regions = Arrays.asList(Region.values());
-
-		// 都道府県プルダウン情報をセット
-		model.addAttribute("regions", regions);
+		//L3出力
+		logger.info(String.format(LogMessage.APP_LOG, "POST", "search", "END"));
 
 		return "admin/centerInfo/index";
 	}

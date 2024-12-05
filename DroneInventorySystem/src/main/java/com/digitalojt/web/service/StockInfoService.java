@@ -36,7 +36,9 @@ public class StockInfoService {
 	 * @return
 	 */
 	public List<StockInfo> getStockInfoData(StockInfoForm form) {
-		if (form.getCategoryId() == null && form.getStockName() == null && form.getAmount() == null
+		if (form.getCategoryId() == null
+				&& form.getStockName() == null
+				&& form.getAmount() == null
 				&& form.getIsAboveOrBelowFlag() == null) {
 			return repository.findAll(); // 全件取得
 		}

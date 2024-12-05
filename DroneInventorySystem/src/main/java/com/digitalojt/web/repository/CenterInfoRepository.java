@@ -30,8 +30,7 @@ public interface CenterInfoRepository extends JpaRepository<CenterInfo, Integer>
 			"(:centerName = '' OR s.centerName LIKE %:centerName%) AND " +
 			"(:region = '' OR s.address LIKE %:region%) AND " +
 			"(:storageCapacityFrom IS NULL OR s.currentStorageCapacity >= :storageCapacityFrom) AND " +
-			"(:storageCapacityTo IS NULL OR s.currentStorageCapacity <= :storageCapacityTo) AND " +
-			"(s.operationalStatus = 0)")
+			"(:storageCapacityTo IS NULL OR s.currentStorageCapacity <= :storageCapacityTo)")
 	List<CenterInfo> findByCenterNameAndRegionAndStorageCapacity(
 			String centerName,
 			String region,

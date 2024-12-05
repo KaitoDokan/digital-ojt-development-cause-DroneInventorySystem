@@ -10,8 +10,8 @@ import lombok.Data;
 
 @Data
 public class StockListViewData {
+	private StockInfoForm form; // 入力フォームの保持データ
 	private List<StockInfo> stockInfoList;// 在庫一覧データ
 	private List<StockInfo> selectStockInfoList; // プルダウン用在庫データ
-	private List<CategoryInfo> categories; // 分類情報
-	private StockInfoForm form; // 入力フォームの保持データ
+	private List<CategoryInfo> categories; // 分類情報プルダウン
 }

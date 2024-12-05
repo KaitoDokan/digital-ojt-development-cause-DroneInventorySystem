@@ -31,6 +31,13 @@ public class ErrorMessage {
 
 	// 半角数字以外が入力されたときに関するエラーメッセージ
 	public static final String NON_NUMERIC_INPUT_ERROR_MESSAGE = "non.numeric.input";
+	
+	//Integer型として受け付けない数値が入力されたときに関するエラーメッセージ
+	public static final String UNEXPECTED_NUMBER_INPUT_ERROR_MESSAGE = "unexpected.number.input";
+
+	//FromToの理論に異常があるときに関するエラーメッセージ
+	public static final String FROM_TO_INPUT_ERROR_MESSAGE = "from.to.input";
+
 
 
 }

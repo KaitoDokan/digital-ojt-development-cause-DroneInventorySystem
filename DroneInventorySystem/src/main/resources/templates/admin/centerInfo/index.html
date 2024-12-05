@@ -21,14 +21,24 @@
 					<label for="searchTerm" class="mr-2">検索条件</label>
 
 					<label for="searchTerm" class="mr-2">センター名</label>
-					<input type="text" id="searchTerm" name="centerName" class="form-control mr-2">
+					<input type="text" id="searchTerm" name="centerName" class="form-control mr-2"
+					th:value="${inputtedValue.centerName}">
 
 					<label for="searchTerm" class="mr-2">地域</label>
 					<select id="searchTerm" name="region" class="form-control mr-2">
 						<option value="">選択してください</option>
-						<option th:each="region : ${regions}" th:value="${region.name}" th:text="${region.name}">
+						<option th:each="region : ${regions}" th:value="${region.name}" th:text="${region.name}"
+						th:selected="${region.name == inputtedValue.region}">
 						</option>
 					</select>
+
+					<label for="searchTerm" class="mr-2">個数(現在)</label>
+					<input type="number" id="searchTerm" name="storageCapacityFrom" class="form-control mr-2"
+						th:value="${inputtedValue.storageCapacityFrom != null ? inputtedValue.storageCapacityFrom : 0}">
+						～
+					<label for="searchTerm" class="mr-2"></label>
+					<input type="number" id="searchTerm" name="storageCapacityTo" class="form-control mr-2"
+						th:value="${inputtedValue.storageCapacityTo != null ? inputtedValue.storageCapacityTo : 99999999}">
 
 					<button type="submit" class="btn btn-primary">検索</button>
 				</form>
@@ -48,14 +58,20 @@
 							<th>住所</th>
 							<th>連絡先</th>
 							<th>管理者名</th>
+							<th>稼働状況</th>
+							<th>最大保存容量</th>
+							<th>現在保存容量</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="item : ${centerInfoList}">
-							<td> [[${item.centerName}]] </td>
-							<td> [[${item.address}]] </td>
-							<td> [[${item.phoneNumber}]] </td>
-							<td> [[${item.managerName}]] </td>
+						<tr th:each="centerInfo : ${centerInfoList}">
+							<td> [[${centerInfo.centerName}]] </td>
+							<td> [[${centerInfo.address}]] </td>
+							<td> [[${centerInfo.phoneNumber}]] </td>
+							<td> [[${centerInfo.managerName}]] </td>
+							<td> [[${centerInfo.operationalStatus}]] </td>
+							<td> [[${centerInfo.maxStorageCapacity}]] </td>
+							<td> [[${centerInfo.currentStorageCapacity}]] </td>
 						</tr>
 					</tbody>
 				</table>

@@ -68,6 +68,7 @@ public class StockListController extends AbstractController {
 		}
 		//L3出力
 		logger.info(String.format(LogMessage.APP_LOG, "GET", "stockListView", "END"));
+
 		return "admin/stockList/index";
 	}
 
@@ -96,9 +97,9 @@ public class StockListController extends AbstractController {
 				model.addAttribute("errorMsg", errorMsg);
 				data = stockInfoService.getStockListViewData(new StockInfoForm()); // フォームの入力なしで全件取得
 				//L2出力
-				logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search-ValidError",form));
-//負の数を入力した場合保持がリセットされる。いい実装がなければ仕様変更
-//amountに999999999999等入れた場合、nullが返されてしまいバリデーションエラーとならない
+				logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search-ValidError", form));
+				//負の数を入力した場合保持がリセットされる。いい実装がなければ仕様変更
+				//amountに999999999999等入れた場合、nullが返されてしまいバリデーションエラーとならない
 			} else {
 				//フォームに入力された情報から検索、再セット
 				data = stockInfoService.getStockListViewData(form);

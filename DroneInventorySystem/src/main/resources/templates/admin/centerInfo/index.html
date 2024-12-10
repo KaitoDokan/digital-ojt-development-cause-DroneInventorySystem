@@ -22,20 +22,20 @@
 
 					<label for="searchTerm" class="mr-2">センター名</label>
 					<input type="text" id="searchTerm" name="centerName" class="form-control mr-2"
-					th:value="${inputtedValue.centerName}">
+						th:value="${inputtedValue.centerName}">
 
 					<label for="searchTerm" class="mr-2">地域</label>
 					<select id="searchTerm" name="region" class="form-control mr-2">
 						<option value="">選択してください</option>
 						<option th:each="region : ${regions}" th:value="${region.name}" th:text="${region.name}"
-						th:selected="${region.name == inputtedValue.region}">
+							th:selected="${region.name == inputtedValue.region}">
 						</option>
 					</select>
 
 					<label for="searchTerm" class="mr-2">個数(現在)</label>
 					<input type="number" id="searchTerm" name="storageCapacityFrom" class="form-control mr-2"
 						th:value="${inputtedValue.storageCapacityFrom != null ? inputtedValue.storageCapacityFrom : 0}">
-						～
+					～
 					<label for="searchTerm" class="mr-2"></label>
 					<input type="number" id="searchTerm" name="storageCapacityTo" class="form-control mr-2"
 						th:value="${inputtedValue.storageCapacityTo != null ? inputtedValue.storageCapacityTo : 99999999}">
@@ -43,10 +43,24 @@
 					<button type="submit" class="btn btn-primary">検索</button>
 				</form>
 
+				<!-- 在庫センター登録ボタン -->
+				<div class="d-flex justify-content-end">
+					<a href="/admin/centerInfo/register" class="btn btn-success">在庫センター登録</a>
+				</div>
+
 				<!-- エラーメッセージの表示 -->
+
 				<div th:if="${errorMsg != null}" class="text-danger">
 					<p th:text="${errorMsg}"></p>
 				</div>
+
+				<!-- DB登録成功メッセージの表示 -->
+
+				<div th:if="${successMsg != null}" class="alert alert-success d-flex align-items-center">
+					<p th:text="${successMsg}"></p>
+				</div>
+
+
 			</div>
 
 			<!-- 在庫センター情報テーブル -->
@@ -55,23 +69,34 @@
 					<thead>
 						<tr>
 							<th>センター名</th>
+							<th>郵便番号</th>
 							<th>住所</th>
 							<th>連絡先</th>
 							<th>管理者名</th>
 							<th>稼働状況</th>
 							<th>最大保存容量</th>
 							<th>現在保存容量</th>
+							<th></th>
+							<th></th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr th:each="centerInfo : ${centerInfoList}">
 							<td> [[${centerInfo.centerName}]] </td>
+							<td> [[${centerInfo.postCode}]] </td>
 							<td> [[${centerInfo.address}]] </td>
 							<td> [[${centerInfo.phoneNumber}]] </td>
 							<td> [[${centerInfo.managerName}]] </td>
-							<td> [[${centerInfo.operationalStatus}]] </td>
+							<td th:text="${centerInfo.operationalStatus == 1 ? '稼働停止' : ''}"></td>
 							<td> [[${centerInfo.maxStorageCapacity}]] </td>
 							<td> [[${centerInfo.currentStorageCapacity}]] </td>
+							<td><a class="btn btn-primary"
+									th:href="@{'/admin/centerInfo/update/'+${centerInfo.centerId}}">
+									<span>編集</span>
+								</a></td>
+							<td><a class="btn btn-danger" th:href="@{'/admin/centerInfo/delete/'+${centerInfo.centerId}}">
+									<span>削除</span>
+								</a></td>
 						</tr>
 					</tbody>
 				</table>

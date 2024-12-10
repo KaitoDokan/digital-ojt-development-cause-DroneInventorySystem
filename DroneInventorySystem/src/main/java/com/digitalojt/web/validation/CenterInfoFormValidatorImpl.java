@@ -50,9 +50,7 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 
 			// 不正文字列チェック
 			if (ParamCheckUtil.isParameterInvalid(form.getRegion())) {
-				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(ErrorMessage.INVALID_INPUT_ERROR_MESSAGE)
-						.addConstraintViolation();
+				setErrorMessage(context, ErrorMessage.INVALID_INPUT_ERROR_MESSAGE);
 				isValid = false;
 			}
 		}
@@ -74,7 +72,6 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 
 		// 数量(To)のチェック
 		if (form.getStorageCapacityTo() != null) {
-
 			//半角数字チェック
 			if (ParamCheckUtil.isNumeric(form.getStorageCapacityTo())) {
 				setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
@@ -89,7 +86,7 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 
 		//FromTo論理チェック
 		if (form.getStorageCapacityFrom() != null & form.getStorageCapacityTo() != null) {
-			
+
 			if (ParamCheckUtil.compareFromTo(form.getStorageCapacityFrom(), form.getStorageCapacityTo())) {
 				setErrorMessage(context, ErrorMessage.FROM_TO_INPUT_ERROR_MESSAGE);
 				isValid = false;
@@ -103,8 +100,9 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 	private boolean areAllFieldsEmpty(CenterInfoForm form) {
 		return (form.getCenterName().isEmpty()) &&
 				(form.getRegion().isEmpty()) &&
-				(form.getStorageCapacityFrom() == null) &&
-				(form.getStorageCapacityTo() == null);
+//この辺いじれば大きい数字でのnullを許容？できるかも
+//フィールドごとにエラーだしたい。
+				((form.getStorageCapacityFrom() == null) && (form.getStorageCapacityTo() == null));
 	}
 
 	private void setErrorMessage(ConstraintValidatorContext context, String errorMessage) {

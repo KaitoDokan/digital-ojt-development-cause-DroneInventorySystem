@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 
 import com.digitalojt.web.dto.StockListViewData;
 import com.digitalojt.web.entity.CategoryInfo;
+import com.digitalojt.web.entity.CenterInfo;
 import com.digitalojt.web.entity.StockInfo;
 import com.digitalojt.web.form.StockInfoForm;
 import com.digitalojt.web.repository.StockInfoRepository;
@@ -60,6 +61,16 @@ public class StockInfoService {
 			return repository.findAll(); // categoryIdがnullなら全件取得
 		}
 		return repository.findByCategoryInfo_CategoryId(categoryId); // 指定されたcategoryIdで絞り込んで取得
+	}
+	
+	/**
+	 * 在庫一覧情報をcenterInfoによる検索で取得
+	 * 
+	 * @param categoryId
+	 * @return
+	 */
+	public List<StockInfo> getStockInfoData(CenterInfo centerInfo) {
+		return repository.findByCenterInfo(centerInfo); // 指定されたcategoryIdで絞り込んで取得
 	}
 
 	/**

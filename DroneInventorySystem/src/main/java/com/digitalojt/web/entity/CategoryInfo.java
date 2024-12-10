@@ -5,8 +5,6 @@ import java.sql.Timestamp;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * 分類情報Entity
@@ -15,8 +13,6 @@ import lombok.Setter;
  *
  */
 @Data
-@Getter
-@Setter
 @Entity
 public class CategoryInfo {
 
@@ -25,17 +21,17 @@ public class CategoryInfo {
 	 */
 	@Id
 	private int categoryId;
-	
+
 	/**
 	 * 分類名
 	 */
 	private String categoryName;
-	
+
 	/**
 	 * 論理削除フラグ
 	 */
 	private String deleteFlag;
-	
+
 	/**
 	 * 登録日
 	 */

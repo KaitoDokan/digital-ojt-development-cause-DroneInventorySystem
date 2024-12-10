@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.digitalojt.web.entity.CenterInfo;
 import com.digitalojt.web.entity.StockInfo;
 
 /**
@@ -49,5 +50,13 @@ public interface StockInfoRepository extends JpaRepository<StockInfo, Integer> {
 	 * @return paramで検索した結果
 	 */
 	List<StockInfo> findByCategoryInfo_CategoryId(Integer categoryId);
+	
+	/**
+	 * 引数に合致する在庫情報を取得
+	 * 
+	 * @param centerinfo
+	 * @return paramで検索した結果
+	 */
+	List<StockInfo> findByCenterInfo(CenterInfo centerinfo);
 
 }

@@ -1,14 +1,20 @@
 package com.digitalojt.web.service;
 
-import java.util.ArrayList;
+import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.thymeleaf.util.StringUtils;
+import org.springframework.ui.Model;
 
+import com.digitalojt.web.consts.Region;
+import com.digitalojt.web.dto.CenterListViewData;
 import com.digitalojt.web.entity.CenterInfo;
+import com.digitalojt.web.entity.StockInfo;
+import com.digitalojt.web.form.CenterInfoForm;
 import com.digitalojt.web.repository.CenterInfoRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -21,124 +27,153 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CenterInfoService {
 
+	/** 在庫一覧サービス */
+	private final StockInfoService stockInfoService;
+
 	/** センター情報テーブル リポジトリー */
 	private final CenterInfoRepository repository;
 
 	/**
-	 * 在庫センター情報を全件検索で取得
+	 * 在庫センター情報をformによる検索で取得
 	 * 
-	 * @return
+	 * @param CenterInfoForm
+	 * @return CenterInfo
 	 */
-	public List<CenterInfo> getCenterInfoData() {
+	public List<CenterInfo> getCenterInfoData(CenterInfoForm form) {
 
-		// 在庫センター情報作成
-		List<CenterInfo> centerInfoList = createCenterInfo();
-
-		return centerInfoList;
+		if (form.getCenterName() == null
+				&& form.getRegion() == null
+				&& form.getStorageCapacityFrom() == null
+				&& form.getStorageCapacityTo() == null) {
+			return repository.findAll(); // 全件取得
+		}
+		return repository.findByCenterNameAndRegionAndStorageCapacity(
+				form.getCenterName(),
+				form.getRegion(),
+				form.getStorageCapacityFrom(),
+				form.getStorageCapacityTo());
 	}
 
 	/**
-	 * 引数に合致する在庫センター情報を取得
+	 * 在庫センター情報をcenterIdによる検索で取得
 	 * 
-	 * @param centerName
-	 * @param region 
-	 * @param storageCapacityFrom 
-	 * @param storageCapacityTo
-	 * @return 
+	 * @param centerId
+	 * @return centerInfo
 	 */
-	public List<CenterInfo> getCenterInfoData(String centerName, String region) {
+	public CenterInfo getCenterInfoData(Integer centerId) {
+		CenterInfo centerInfo = repository.findById(centerId).orElse(null);
+		if (centerInfo == null) {
+			throw new EntityNotFoundException("Center not found with ID: " + centerId);
+		}
+		return centerInfo;
+	}
+	
+	/**
+	 * 在庫が存在するセンターかどうか
+	 * 
+	 * @param centerId センターID
+	 * @return 在庫が存在する場合はtrue、それ以外はfalse
+	 */
+	public boolean isCenterWithStockExists(CenterInfo centerinfo) {
+	    // centerId に一致する在庫情報を取得
+	    List<StockInfo> stockInfoList = stockInfoService.getStockInfoData(centerinfo);
+	    System.out.println(stockInfoList);
 
-		// 在庫センター情報作成
-		List<CenterInfo> centerInfoList = createCenterInfo();
+	    // 取得したリストが null または 空でない場合は true、それ以外は false
+	    return stockInfoList != null && !stockInfoList.isEmpty();
+	}
 
-		// 検索処理
-		centerInfoList = searchCenterInfoData(centerInfoList, centerName, region);
 
-		return centerInfoList;
+	/**
+	 * 在庫一覧画面の共通データを取得
+	 * 
+	 * @param form フォームオブジェクト
+	 * @return 在庫画面の共通データを格納するDTO
+	 */
+	public CenterListViewData getCenterListViewData(CenterInfoForm form) {
+		CenterListViewData data = new CenterListViewData();
+
+		// 在庫センター情報の取得
+		List<CenterInfo> centerInfoList = this.getCenterInfoData(form);
+
+		// 都道府県リストの取得
+		List<Region> regions = Arrays.asList(Region.values());
+
+		// DTOにセット
+		data.setCenterInfoList(centerInfoList);
+		data.setRegions(regions);
+		data.setForm(form);
+
+		return data;
 	}
 
 	/**
-	 * 検索処理
+	 * 共通のmodelをセットする
 	 * 
-	 * @param centerInfoList
-	 * @param centerName
-	 * @param region 
-	 * @return
+	 * @param model   Modelオブジェクト
+	 * @param data    在庫一覧画面の共通データ
 	 */
-	private List<CenterInfo> searchCenterInfoData(List<CenterInfo> centerInfoList, String centerName, String region) {
-
-		List<CenterInfo> hitCenterInfoList = new ArrayList<>();
-		
-		// 引数の文字列と合致する要素のみリストに追加
-		centerInfoList.forEach(item -> {
-			if (centerName.equals(item.getCenterName()) && region.equals(item.getAddress())
-					|| StringUtils.isEmpty(centerName) && item.getAddress().contains(region)
-					|| StringUtils.isEmpty(region) && item.getCenterName().contains(centerName)) {
-				hitCenterInfoList.add(item);
-			}
-		});
-
-		return hitCenterInfoList;
+	public void setCommonModelAttributes(Model model, CenterListViewData data) {
+		model.addAttribute("inputtedValue", data.getForm()); // 検索結果を保持するためのセット
+		model.addAttribute("centerInfoList", data.getCenterInfoList()); // 画面表示用に検索結果をセット
+		model.addAttribute("regions", data.getRegions()); // 在庫プルダウン情報をセット
 	}
 
-	/**
-	 * 在庫センター情報作成
-	 * 
-	 * @return
-	 */
-	private List<CenterInfo> createCenterInfo() {
+	//	public void registerCenterInfo(CenterRegisterForm form) {
+	//		// フォームからエンティティへの変換
+	//		CenterInfo centerInfo = new CenterInfo();
+	//		centerInfo.setCenterName(form.getCenterName());
+	//		centerInfo.setPostCode(form.getPostCode());
+	//		centerInfo.setAddress(form.getAddress());
+	//		centerInfo.setPhoneNumber(form.getPhoneNumber());
+	//		centerInfo.setManagerName(form.getManagerName());
+	//		centerInfo.setOperationalStatus(form.getOperationalStatus());
+	//		centerInfo.setMaxStorageCapacity(form.getMaxStorageCapacity());
+	//		centerInfo.setCurrentStorageCapacity(form.getCurrentStorageCapacity());
+	//		centerInfo.setDeleteFlag("0"); // 新規登録の場合、論理削除フラグは"未削除"に設定
+	//		centerInfo.setCreateDate(new Timestamp(System.currentTimeMillis())); // 登録日
+	//		centerInfo.setUpdateDate(new Timestamp(System.currentTimeMillis())); // 更新日
+	//
+	//		// エンティティをデータベースに保存
+	//		repository.save(centerInfo);
+	//	}
 
-		List<CenterInfo> centerInfoList = new ArrayList<>();
+	public void registerCenterInfo(CenterInfo centerInfo) {
+		centerInfo.setDeleteFlag("0"); // 新規登録の場合、論理削除フラグは"未削除"に設定
+		centerInfo.setCreateDate(new Timestamp(System.currentTimeMillis())); // 登録日
+		centerInfo.setUpdateDate(new Timestamp(System.currentTimeMillis())); // 更新日
 
-		// 1コード目作成
-		CenterInfo centerInfo = new CenterInfo();
-		centerInfo.setCenterName("東京物流センター");
-		centerInfo.setAddress("東京都港区芝公園4-2-8");
-		centerInfo.setPhoneNumber("03-1234-5678");
-		centerInfo.setManagerName("田中 太郎");
-		centerInfoList.add(centerInfo);
+		// エンティティをデータベースに保存
+		repository.save(centerInfo);
+	}
 
-		// 2コード目作成
-		centerInfo = new CenterInfo();
-		centerInfo.setCenterName("大阪物流センター");
-		centerInfo.setAddress("大阪府大阪市北区梅田1-1-3");
-		centerInfo.setPhoneNumber("06-8765-4321");
-		centerInfo.setManagerName("鈴木 一郎");
-		centerInfoList.add(centerInfo);
+	public void updateCenterInfo(CenterInfo centerInfo) {
+		//hiddenでフォームから送らせても良いが、書き換えのリスクを鑑みてここで再取得
+		// DBから既存データを再取得
+		CenterInfo oldCenterInfo = repository.findById(centerInfo.getCenterId())
+				.orElseThrow(() -> new IllegalArgumentException("指定されたセンター情報が存在しません"));
 
-		// 3コード目作成
-		centerInfo = new CenterInfo();
-		centerInfo.setCenterName("名古屋物流センター");
-		centerInfo.setAddress("愛知県名古屋市中村区名駅3-2-1");
-		centerInfo.setPhoneNumber("052-123-4567");
-		centerInfo.setManagerName("佐藤 花子");
-		centerInfoList.add(centerInfo);
+		centerInfo.setDeleteFlag(oldCenterInfo.getDeleteFlag()); // 更新の場合、論理削除フラグは"未削除"に設定
+		centerInfo.setCreateDate(oldCenterInfo.getCreateDate()); // 登録日
+		centerInfo.setUpdateDate(new Timestamp(System.currentTimeMillis())); // 更新日
 
-		// 4コード目作成
-		centerInfo = new CenterInfo();
-		centerInfo.setCenterName("仙台物流センター");
-		centerInfo.setAddress("宮城県仙台市青葉区一番町4-4-1");
-		centerInfo.setPhoneNumber("022-234-5678");
-		centerInfo.setManagerName("中田 太郎");
-		centerInfoList.add(centerInfo);
+		// エンティティをデータベースに保存
+		repository.save(centerInfo);
+	}
 
-		// 5コード目作成
-		centerInfo = new CenterInfo();
-		centerInfo.setCenterName("福岡物流センター");
-		centerInfo.setAddress("福岡県福岡市博多区博多駅前2-1-1");
-		centerInfo.setPhoneNumber("092-234-5678");
-		centerInfo.setManagerName("近藤 一郎");
-		centerInfoList.add(centerInfo);
+	public void deleteCenterInfo(CenterInfo centerInfo) {
+		//hiddenでフォームから送らせても良いが、書き換えのリスクを鑑みてここで再取得
+		// DBから既存データを再取得
 
-		// 6コード目作成
-		centerInfo = new CenterInfo();
-		centerInfo.setCenterName("北海道物流センター");
-		centerInfo.setAddress("北海道札幌市中央区大通西3-6");
-		centerInfo.setPhoneNumber("011-234-5678");
-		centerInfo.setManagerName("小池 花子");
-		centerInfoList.add(centerInfo);
-
-		return centerInfoList;
+		CenterInfo oldCenterInfo = repository.findById(centerInfo.getCenterId())
+				.orElseThrow(() -> new IllegalArgumentException("指定されたセンター情報が存在しません"));
+		System.out.println(centerInfo);
+		centerInfo.setDeleteFlag("1"); // 更新の場合、論理削除フラグは"未削除"に設定
+		centerInfo.setCreateDate(oldCenterInfo.getCreateDate()); // 登録日
+		centerInfo.setUpdateDate(new Timestamp(System.currentTimeMillis())); // 更新日
+		System.out.println(centerInfo);
+		// エンティティをデータベースに保存
+		repository.save(centerInfo);
 	}
 
 }

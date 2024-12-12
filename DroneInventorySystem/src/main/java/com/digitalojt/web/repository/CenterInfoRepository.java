@@ -1,6 +1,7 @@
 package com.digitalojt.web.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,12 @@ import com.digitalojt.web.entity.CenterInfo;
 @Repository
 public interface CenterInfoRepository extends JpaRepository<CenterInfo, Integer> {
 
+	@Query("SELECT c FROM CenterInfo c WHERE c.deleteFlag = '0'")
+	List<CenterInfo> findAll();//全件取得
+
+	@Query("SELECT c FROM CenterInfo c WHERE c.deleteFlag = '0' AND c.centerId = :centerId")
+	Optional<CenterInfo> findById(Integer centerId);//centerIdによって取得
+
 	/**
 	 * 引数に合致する在庫センター情報を取得
 	 * 
@@ -26,12 +33,12 @@ public interface CenterInfoRepository extends JpaRepository<CenterInfo, Integer>
 	 * @param storageCapacityTo
 	 * @return paramで検索した結果
 	 */
-	@Query("SELECT s FROM CenterInfo s WHERE " +
-			"(:centerName = '' OR s.centerName LIKE %:centerName%) AND " +
-			"(:region = '' OR s.address LIKE %:region%) AND " +
-			"(:storageCapacityFrom IS NULL OR s.currentStorageCapacity >= :storageCapacityFrom) AND " +
-			"(:storageCapacityTo IS NULL OR s.currentStorageCapacity <= :storageCapacityTo) AND " +
-			"(s.operationalStatus = 0)")
+	@Query("SELECT c FROM CenterInfo c WHERE " +
+			"(:centerName = '' OR c.centerName LIKE %:centerName%) AND " +
+			"(:region = '' OR c.address LIKE %:region%) AND " +
+			"(:storageCapacityFrom IS NULL OR c.currentStorageCapacity >= :storageCapacityFrom) AND " +
+			"(:storageCapacityTo IS NULL OR c.currentStorageCapacity <= :storageCapacityTo) AND " +
+			"c.deleteFlag = '0'")
 	List<CenterInfo> findByCenterNameAndRegionAndStorageCapacity(
 			String centerName,
 			String region,

@@ -1,7 +1,5 @@
 package com.digitalojt.web.validation;
 
-import org.thymeleaf.util.StringUtils;
-
 import com.digitalojt.web.consts.ErrorMessage;
 import com.digitalojt.web.consts.SearchParams;
 import com.digitalojt.web.form.CenterInfoForm;
@@ -23,34 +21,27 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 	@Override
 	public boolean isValid(CenterInfoForm form, ConstraintValidatorContext context) {
 
-		boolean allFieldsEmpty = StringUtils.isEmpty(form.getCenterName()) &&
-				StringUtils.isEmpty(form.getRegion());
+		boolean isValid = true;
 
 		// すべてのフィールドが空かをチェック
-		if (allFieldsEmpty) {
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(ErrorMessage.ALL_FIELDS_EMPTY_ERROR_MESSAGE)
-					.addConstraintViolation();
-			return false;
+		if (areAllFieldsEmpty(form)) {
+			setErrorMessage(context, ErrorMessage.ALL_FIELDS_EMPTY_ERROR_MESSAGE);
+			isValid = false;
 		}
 
 		// センター名のチェック
 		if (form.getCenterName() != null) {
 
-			// 不正文字列チェック
+			//不正文字列チェック
 			if (ParamCheckUtil.isParameterInvalid(form.getCenterName())) {
-				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(ErrorMessage.INVALID_INPUT_ERROR_MESSAGE)
-						.addConstraintViolation();
-				return false;
+				setErrorMessage(context, ErrorMessage.INVALID_INPUT_ERROR_MESSAGE);
+				isValid = false;
 			}
 
 			// 文字数チェック
 			if (form.getCenterName().length() > SearchParams.CENTER_MAX_LENGTH) {
-				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(ErrorMessage.CENTER_NAME_LENGTH_ERROR_MESSAGE)
-						.addConstraintViolation();
-				return false;
+				setErrorMessage(context, ErrorMessage.CENTER_NAME_LENGTH_ERROR_MESSAGE);
+				isValid = false;
 			}
 		}
 
@@ -59,14 +50,63 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 
 			// 不正文字列チェック
 			if (ParamCheckUtil.isParameterInvalid(form.getRegion())) {
-				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(ErrorMessage.INVALID_INPUT_ERROR_MESSAGE)
-						.addConstraintViolation();
-				return false;
+				setErrorMessage(context, ErrorMessage.INVALID_INPUT_ERROR_MESSAGE);
+				isValid = false;
+			}
+		}
+
+		// 数量(From)のチェック
+		if (form.getStorageCapacityFrom() != null) {
+
+			//半角数字チェック
+			if (ParamCheckUtil.isNumeric(form.getStorageCapacityFrom())) {
+				setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+				isValid = false;
+			}
+			// 数値の範囲をチェック
+			if (ParamCheckUtil.isWithinRange(form.getStorageCapacityFrom())) {
+				setErrorMessage(context, ErrorMessage.UNEXPECTED_NUMBER_INPUT_ERROR_MESSAGE);
+				isValid = false;
+			}
+		}
+
+		// 数量(To)のチェック
+		if (form.getStorageCapacityTo() != null) {
+			//半角数字チェック
+			if (ParamCheckUtil.isNumeric(form.getStorageCapacityTo())) {
+				setErrorMessage(context, ErrorMessage.NON_NUMERIC_INPUT_ERROR_MESSAGE);
+				isValid = false;
+			}
+			// 数値の範囲をチェック
+			if (ParamCheckUtil.isWithinRange(form.getStorageCapacityTo())) {
+				setErrorMessage(context, ErrorMessage.UNEXPECTED_NUMBER_INPUT_ERROR_MESSAGE);
+				isValid = false;
+			}
+		}
+
+		//FromTo論理チェック
+		if (form.getStorageCapacityFrom() != null & form.getStorageCapacityTo() != null) {
+
+			if (ParamCheckUtil.compareFromTo(form.getStorageCapacityFrom(), form.getStorageCapacityTo())) {
+				setErrorMessage(context, ErrorMessage.FROM_TO_INPUT_ERROR_MESSAGE);
+				isValid = false;
 			}
 		}
 
 		// その他のバリデーションに問題なければtrueを返す
-		return true;
+		return isValid;
 	}
+
+	private boolean areAllFieldsEmpty(CenterInfoForm form) {
+		return (form.getCenterName().isEmpty()) &&
+				(form.getRegion().isEmpty()) &&
+				((form.getStorageCapacityFrom() == null) && (form.getStorageCapacityTo() == null));
+	}
+
+	private void setErrorMessage(ConstraintValidatorContext context, String errorMessage) {
+		context.disableDefaultConstraintViolation();
+		context.buildConstraintViolationWithTemplate(errorMessage)
+				.addConstraintViolation();
+	}
+
 }

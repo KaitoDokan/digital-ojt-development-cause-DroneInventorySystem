@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/template :: layout(~{::title},~{::body/content()})}">
+
+<head>
+	<title>InvenTrack - 削除</title>
+</head>
+
+<body>
+	<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+		<div class="card shadow-lg" style="width: 50%; max-width: 800px;">
+			<div class="bg-warning text-dark text-center py-3">
+				<strong style="font-size:30px; font-weight:bold;">このセンターを削除しますか？</strong>
+			</div>
+			<div class="card-header bg-danger text-white py-2">
+				<h6 class="mb-0">在庫センター情報削除確認</h6>
+			</div>
+			<div class="card-body py-2">
+				<!-- th:objectでcenterInfoをフォームにバインド -->
+				<form class="small" method="post" th:action="@{'/admin/centerInfo/delete/' + ${centerInfo.centerId}}"
+					th:object="${centerInfo}">
+
+					<!-- 在庫センター名 -->
+					<div class="mb-2">
+						<label for="centerName" class="form-label">在庫センター名</label>
+						<input type="text" th:field="*{centerName}" class="form-control form-control-sm" id="centerName"
+							readonly>
+					</div>
+
+					<!-- 郵便番号 -->
+					<div class="mb-2">
+						<label for="postCode" class="form-label">郵便番号</label>
+						<input type="text" th:field="*{postCode}" class="form-control form-control-sm" id="postCode"
+							readonly>
+					</div>
+
+					<!-- 住所 -->
+					<div class="mb-2">
+						<label for="address" class="form-label">住所</label>
+						<input type="text" th:field="*{address}" class="form-control form-control-sm" id="address"
+							readonly>
+					</div>
+
+					<!-- 電話番号 -->
+					<div class="mb-2">
+						<label for="phoneNumber" class="form-label">電話番号</label>
+						<input type="text" th:field="*{phoneNumber}" class="form-control form-control-sm"
+							id="phoneNumber" readonly>
+					</div>
+
+					<!-- 管理者名 -->
+					<div class="mb-2">
+						<label for="managerName" class="form-label">管理者名</label>
+						<input type="text" th:field="*{managerName}" class="form-control form-control-sm"
+							id="managerName" readonly>
+					</div>
+
+					<!-- 稼働状況ステータス -->
+					<div class="mb-2">
+						<label class="form-label">稼働状況ステータス</label>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" th:field="*{operationalStatus}" value="0"
+								id="operationalStatusActive" th:checked="${centerInfo.operationalStatus == 0}"
+								disabled />
+							<label class="form-check-label" for="operationalStatusActive">稼働中</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" th:field="*{operationalStatus}" value="1"
+								id="operationalStatusInactive" th:checked="${centerInfo.operationalStatus == 1}"
+								disabled />
+							<label class="form-check-label" for="operationalStatusInactive">稼働停止</label>
+						</div>
+					</div>
+
+					<!-- 最大保管容量 -->
+					<div class="mb-2">
+						<label for="maxStorageCapacity" class="form-label">最大保管容量（m³）</label>
+						<input type="text" th:field="*{maxStorageCapacity}" class="form-control form-control-sm"
+							id="maxStorageCapacity" readonly>
+					</div>
+
+					<!-- 現在保管容量 -->
+					<div class="mb-2">
+						<label for="currentStorageCapacity" class="form-label">現在保管容量（m³）</label>
+						<input type="text" th:field="*{currentStorageCapacity}" class="form-control form-control-sm"
+							id="currentStorageCapacity" readonly>
+					</div>
+
+					<!-- 備考 -->
+					<div class="mb-2">
+						<label for="notes" class="form-label">備考</label>
+						<textarea th:field="*{notes}" class="form-control form-control-sm" id="notes" rows="2"
+							readonly></textarea>
+					</div>
+
+					<!-- ボタン -->
+					<div class="d-flex justify-content-between">
+						<a href="/admin/centerInfo" class="btn btn-secondary btn-sm">キャンセル</a>
+						<button type="submit" class="btn btn-danger btn-sm">削除する</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

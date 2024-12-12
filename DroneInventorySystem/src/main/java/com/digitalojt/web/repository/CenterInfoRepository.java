@@ -1,6 +1,7 @@
 package com.digitalojt.web.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,10 +18,12 @@ import com.digitalojt.web.entity.CenterInfo;
 @Repository
 public interface CenterInfoRepository extends JpaRepository<CenterInfo, Integer> {
 
-	
 	@Query("SELECT c FROM CenterInfo c WHERE c.deleteFlag = '0'")
 	List<CenterInfo> findAll();//全件取得
-	
+
+	@Query("SELECT c FROM CenterInfo c WHERE c.deleteFlag = '0' AND c.centerId = :centerId")
+	Optional<CenterInfo> findById(Integer centerId);//centerIdによって取得
+
 	/**
 	 * 引数に合致する在庫センター情報を取得
 	 * 

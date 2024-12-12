@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import com.digitalojt.web.dto.StockListViewData;
 import com.digitalojt.web.entity.CategoryInfo;
 import com.digitalojt.web.entity.CenterInfo;
 import com.digitalojt.web.entity.StockInfo;
@@ -33,81 +32,89 @@ public class StockInfoService {
 	/**
 	 * 在庫一覧情報をformによる検索で取得
 	 * 
-	 * @param form
-	 * @return
+	 * @param form 検索条件を含む {@link StockInfoForm}
+	 * @return 検索結果の在庫一覧情報リスト
 	 */
 	public List<StockInfo> getStockInfoData(StockInfoForm form) {
-		if (form.getCategoryId() == null
-				&& form.getStockName() == null
-				&& form.getAmount() == null
-				&& form.getIsAboveOrBelowFlag() == null) {
-			return repository.findAll(); // 全件取得
+		List<StockInfo> stockInfoList;
+		try {
+			//フォームの内容によって在庫情報を検索
+			if (form.getCategoryId() == null
+					&& form.getStockName() == null
+					&& form.getAmount() == null
+					&& form.getIsAboveOrBelowFlag() == null) {
+				stockInfoList = repository.findAll();
+			} else {
+				stockInfoList = repository.findByCategoryIdAndStockNameAndAmount(
+						form.getCategoryId(),
+						form.getStockName(),
+						form.getAmount(),
+						form.getIsAboveOrBelowFlag());
+			}
+		} catch (Exception e) {
+			throw e;
 		}
-		return repository.findByCategoryIdAndStockNameAndAmount(
-				form.getCategoryId(),
-				form.getStockName(),
-				form.getAmount(),
-				form.getIsAboveOrBelowFlag());
+		return stockInfoList;
 	}
 
 	/**
 	 * 在庫一覧情報をcategoryIdによる検索で取得
 	 * 
-	 * @param categoryId
-	 * @return
+	 * @param categoryId 分類ID
+	 * @return 指定された分類IDに対応する在庫一覧情報リスト
 	 */
 	public List<StockInfo> getStockInfoData(Integer categoryId) {
-		if (categoryId == null) {
-			return repository.findAll(); // categoryIdがnullなら全件取得
+		List<StockInfo> stockInfoList;
+		try {
+			//指定されたcategoryIdで在庫情報を取得
+			if (categoryId == null) {
+				stockInfoList = repository.findAll();
+			} else {
+				stockInfoList = repository.findByCategoryInfo_CategoryId(categoryId);
+			}
+		} catch (Exception e) {
+			throw e;
 		}
-		return repository.findByCategoryInfo_CategoryId(categoryId); // 指定されたcategoryIdで絞り込んで取得
+		return stockInfoList;
 	}
-	
+
 	/**
 	 * 在庫一覧情報をcenterInfoによる検索で取得
 	 * 
-	 * @param categoryId
-	 * @return
+	 * @param centerInfo 在庫センター情報
+	 * @return 指定された在庫センターに対応する在庫一覧情報リスト
 	 */
 	public List<StockInfo> getStockInfoData(CenterInfo centerInfo) {
-		return repository.findByCenterInfo(centerInfo); // 指定されたcategoryIdで絞り込んで取得
+		List<StockInfo> stockInfoList;
+		try {
+			//指定された在庫センター情報で在庫情報を取得
+			stockInfoList = repository.findByCenterInfo(centerInfo);
+		} catch (Exception e) {
+			throw e;
+		}
+		return stockInfoList;
 	}
 
 	/**
 	 * 在庫一覧画面の共通データを取得
 	 * 
-	 * @param form フォームオブジェクト
-	 * @return 在庫画面の共通データを格納するDTO
+	 * @param model 画面のモデルオブジェクト
+	 * @param form 在庫一覧の検索条件を含むフォームオブジェクト {@link StockInfoForm}
 	 */
-	public StockListViewData getStockListViewData(StockInfoForm form) {
-		StockListViewData data = new StockListViewData();
+	public void setUpStockListViewData(Model model, StockInfoForm form) {
+		try {
+			//画面表示用データの取得
+			List<StockInfo> stockInfoList = this.getStockInfoData(form);
+			List<StockInfo> selectStockInfoList = this.getStockInfoData(form.getCategoryId());
+			List<CategoryInfo> categories = categoryInfoService.getCategoryInfoData();
 
-		// 在庫情報の取得
-		List<StockInfo> stockInfoList = this.getStockInfoData(form);
-		List<StockInfo> selectStockInfoList = this.getStockInfoData(form);
-
-		// 分類情報の取得
-		List<CategoryInfo> categories = categoryInfoService.getCategoryInfoData();
-
-		// DTOにセット
-		data.setStockInfoList(stockInfoList);
-		data.setSelectStockInfoList(selectStockInfoList);
-		data.setCategories(categories);
-		data.setForm(form);
-
-		return data;
-	}
-
-	/**
-	 * 共通のmodelをセットする
-	 * 
-	 * @param model   Modelオブジェクト
-	 * @param data    在庫一覧画面の共通データ
-	 */
-	public void setCommonModelAttributes(Model model, StockListViewData data) {
-		model.addAttribute("inputtedValue", data.getForm()); // 検索結果を保持するためのセット
-		model.addAttribute("stockInfoList", data.getStockInfoList()); // 画面表示用に検索結果をセット
-		model.addAttribute("categories", data.getCategories()); // 分類プルダウン情報をセット
-		model.addAttribute("selectStockInfoList", data.getSelectStockInfoList()); // 在庫プルダウン情報をセット
+			//画面表示用データのセット
+			model.addAttribute("inputtedValue", form); // 検索結果を保持するためのセット
+			model.addAttribute("stockInfoList", stockInfoList); // 画面表示用に検索結果をセット
+			model.addAttribute("categories", categories); // 分類プルダウン情報をセット
+			model.addAttribute("selectStockInfoList", selectStockInfoList); // 在庫プルダウン情報をセット
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 }

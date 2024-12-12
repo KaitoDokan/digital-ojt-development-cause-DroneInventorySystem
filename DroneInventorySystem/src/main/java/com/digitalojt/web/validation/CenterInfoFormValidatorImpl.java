@@ -100,8 +100,6 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 	private boolean areAllFieldsEmpty(CenterInfoForm form) {
 		return (form.getCenterName().isEmpty()) &&
 				(form.getRegion().isEmpty()) &&
-//この辺いじれば大きい数字でのnullを許容？できるかも
-//フィールドごとにエラーだしたい。
 				((form.getStorageCapacityFrom() == null) && (form.getStorageCapacityTo() == null));
 	}
 

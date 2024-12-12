@@ -40,5 +40,8 @@ public class ErrorMessage {
 
 	//FromToの理論に異常があるときに関するエラーメッセージ
 	public static final String FROM_TO_INPUT_ERROR_MESSAGE = "from.to.input";
+	
+	// 在庫が存在する在庫センターを削除しようとしたときに関するエラーメッセージ
+	public static final String CANNOT_DELETE_CENTER_ERROR_MESSAGE = "cannot.delete.center";
 
 }

@@ -16,9 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.digitalojt.web.consts.LogMessage;
+import com.digitalojt.web.consts.ErrorMessage;
 import com.digitalojt.web.consts.UrlConsts;
-import com.digitalojt.web.dto.CenterListViewData;
 import com.digitalojt.web.entity.CenterInfo;
 import com.digitalojt.web.form.CenterInfoForm;
 import com.digitalojt.web.service.CenterInfoService;
@@ -31,7 +30,6 @@ import lombok.RequiredArgsConstructor;
  * 在庫センター情報画面のコントローラークラス
  * 
  * @author KaitoDokan
- *
  */
 @Controller
 @RequiredArgsConstructor
@@ -49,52 +47,43 @@ public class CenterInfoController extends AbstractController {
 	/**
 	 * 初期表示
 	 * 
-	 * @param model
-	 * @return
+	 * @param model 画面のモデルオブジェクト
+	 * @param form 在庫センター情報の検索条件を含むフォームオブジェクト {@link CenterInfoForm}
+	 * @param redirectAttributes リダイレクト属性
+	 * @return 画面のパス
 	 */
 	@GetMapping(UrlConsts.CENTER_INFO)
-	public String centerListView(Model model, CenterInfoForm form) {
-		//L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerListView", "START"));
+	public String centerListView(Model model, CenterInfoForm form, RedirectAttributes redirectAttributes) {
+		// 開始処理
+		logStart(logger, "GET", "centerListView");
 
 		try {
-			// 共通データをサービスから取得
-			CenterListViewData data = centerInfoService.getCenterListViewData(form);
-			//取得に失敗していればエラー
-			if (data == null) {
-				throw new Exception("データの取得に失敗しました");
-			}
-			//共通データをmodelにセット
-			centerInfoService.setCommonModelAttributes(model, data);
-
+			centerInfoService.setUpCenterListViewData(model, form);
 		} catch (Exception e) {
-			//L2出力
-			logger.error(String.format(LogMessage.ERROR_LOG, "GET", "centerListView", e));
+			// 例外処理
+			logError(logger, "GET", "centerListView-unexpected", e);
+			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
+			return "redirect:" + UrlConsts.STOCK_LIST; // ここで予期せぬエラーが出たら在庫リストにリダイレクト
 		}
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerListView", "END"));
+		// 終了処理
+		logEnd(logger, "GET", "centerListView");
 		return "admin/centerInfo/index";
 	}
 
 	/**
 	 * 検索結果表示
 	 * 
-	 * @param model
-	 * @param form
-	 * @param bindingResult
-	 * @return
+	 * @param model 画面のモデルオブジェクト
+	 * @param form 在庫センター情報の検索条件を含むフォームオブジェクト {@link CenterInfoForm}
+	 * @param bindingResult バインディング結果
+	 * @param redirectAttributes リダイレクト属性
+	 * @return 画面のパス
 	 */
 	@PostMapping(UrlConsts.CENTER_INFO_SEARCH)
-	public String search(Model model, @Valid CenterInfoForm form, BindingResult bindingResult) {
-
-		//L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "search", "START"));
-
-		CenterListViewData data;
+	public String search(Model model, @Valid CenterInfoForm form, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		// 開始処理
+		logStart(logger, "POST", "search");
 		try {
 			// Valid項目チェック
 			if (bindingResult.hasErrors()) {
@@ -102,25 +91,21 @@ public class CenterInfoController extends AbstractController {
 				String errorMsg = MessageManager.getMessage(messageSource,
 						bindingResult.getGlobalError().getDefaultMessage());
 				model.addAttribute("errorMsg", errorMsg);
-				//dataのリセット
-				data = centerInfoService.getCenterListViewData(new CenterInfoForm());
-				//L2出力
-				logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search-ValidError",
-						bindingResult.getFieldErrors()));
-				//大きすぎる数字を送ったときにnullでる。
+				centerInfoService.setUpCenterListViewData(model, new CenterInfoForm());
+				model.addAttribute("inputtedValue", form); // formの再セット
+				// バリデーションエラー処理
+				logValidationError(logger, "POST", "search-ValidError", form + errorMsg);
 			} else {
-				//フォームに入力された情報から検索、再セット
-				data = centerInfoService.getCenterListViewData(form);
+				centerInfoService.setUpCenterListViewData(model, form);
 			}
-			//共通データをmodelにセット
-			centerInfoService.setCommonModelAttributes(model, data);
-
 		} catch (Exception e) {
-			//L2出力
-			logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search", e));
+			// 例外処理
+			logError(logger, "POST", "search-unexpected", e);
+			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
+			return "redirect:" + UrlConsts.CENTER_INFO;
 		}
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "search", "END"));
+		// 終了処理
+		logEnd(logger, "POST", "search");
 
 		return "admin/centerInfo/index";
 	}
@@ -128,80 +113,57 @@ public class CenterInfoController extends AbstractController {
 	/**
 	 * 登録フォームの表示
 	 * 
-	 * @param model
-	 * @return
+	 * @param model 画面のモデルオブジェクト
+	 * @param centerInfo 登録する在庫センター情報 {@link CenterInfo}
+	 * @return 画面のパス
 	 */
 	@GetMapping(UrlConsts.CENTER_INFO_REGISTER)
 	public String centerRegister(Model model, CenterInfo centerInfo) {
-
-		//L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerRegister", "START"));
-
-		//		try {
-		//			// 共通データをサービスから取得
-		//			CenterListViewData data = centerInfoService.getCenterListViewData(form);
-		//			//取得に失敗していればエラー
-		//			if (data == null) {
-		//				throw new RuntimeException("データの取得に失敗しました");
-		//			}
-		//			//共通データをmodelにセット
-		//			centerInfoService.setCommonModelAttributes(model, data);
-		//
-		//		} catch (RuntimeException e) {
-		//			//L2出力
-		//			logger.error(String.format(LogMessage.ERROR_LOG, "GET", "centerRegister", e));
-		//		}
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerRegister", "END"));
-
+		logStart(logger, "GET", "centerRegister");
+		logEnd(logger, "GET", "centerRegister");
 		return "admin/centerInfo/register";
 	}
 
 	/**
 	 * 登録内容確認
 	 * 
-	 * @param model
-	 * @param centerInfo
-	 * @return
+	 * @param model 画面のモデルオブジェクト
+	 * @param centerInfo 登録する在庫センター情報 {@link CenterInfo}
+	 * @param bindingResult バインディング結果
+	 * @param redirectAttributes リダイレクト属性
+	 * @return 画面のパス
 	 */
 	@PostMapping(UrlConsts.CENTER_INFO_REGISTER)
 	@Transactional
 	public String centerRegister(Model model, @Valid CenterInfo centerInfo, BindingResult bindingResult,
 			RedirectAttributes redirectAttributes) {
-		// L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		// L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "centerRegister-transaction", "START"));
+		// 開始処理
+		logStart(logger, "POST", "centerRegister");
 
 		try {
-			//入力チェック（バリデーション）
+			// 入力チェック（バリデーション）
 			if (bindingResult.hasFieldErrors()) {
-
 				List<String> errorFields = new ArrayList<>();
 				for (FieldError fieldError : bindingResult.getFieldErrors()) {
 					// エラーがあるフィールド名をリストに追加
 					errorFields.add(fieldError.getField());
 				}
-				// L2出力
-				logger.error(String.format(LogMessage.ERROR_LOG, "POST", "centerRegister-ValidError", errorFields));
+				//バリデーションエラー処理
+				logValidationError(logger, "POST", "centerRegister-ValidError", errorFields.toString());
 				return "admin/centerInfo/register"; // バリデーションエラーがあった場合は登録フォームに戻る
 			}
-
 			// センター情報を登録
 			centerInfoService.registerCenterInfo(centerInfo);
 			// 登録成功メッセージをフラッシュスコープに設定
-			redirectAttributes.addFlashAttribute("successMsg", "センター情報が登録されました。");
+			redirectAttributes.addFlashAttribute("successMsg", centerInfo.getCenterName() + "が登録されました。");
 
 		} catch (Exception e) {
-			// L2出力
-			logger.error(String.format(LogMessage.ERROR_LOG, "POST", "centerRegister-unexpected", e));
-			return "admin/centerInfo/register"; // 例外が発生した場合は登録フォームに戻る
+			// 例外処理
+			logError(logger, "POST", "centerRegister-unexpected", e);
+			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
 		}
-		// L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "centerRegister-transaction", "END"));
-
+		// 終了処理
+		logEnd(logger, "POST", "centerRegister");
 		// 在庫センター情報画面に戻る
 		return "redirect:" + UrlConsts.CENTER_INFO; // 在庫センター情報画面にリダイレクト
 	}
@@ -209,33 +171,29 @@ public class CenterInfoController extends AbstractController {
 	/**
 	 * 更新フォームの表示
 	 * 
-	 * @param model
-	 * @param centerInfo
-	 * @return
+	 * @param centerId センターID
+	 * @param model 画面のモデルオブジェクト
+	 * @param redirectAttributes リダイレクト属性
+	 * @return 画面のパス
 	 */
 	@GetMapping(UrlConsts.CENTER_INFO_UPDATE + "/{centerId}")
-	public String centerUpdate(@PathVariable Integer centerId, Model model) {
-
-		//L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerUpdate", "START"));
+	public String centerUpdate(@PathVariable Integer centerId, Model model, RedirectAttributes redirectAttributes) {
+		// 開始処理
+		logStart(logger, "GET", "centerUpdate");
 
 		try {
-			//centerIdによって検索取得
+			// centerIdによって検索取得
 			CenterInfo centerInfo = centerInfoService.getCenterInfoData(centerId);
-			//取得に失敗していればエラー
-			if (centerInfo == null) {
-				throw new Exception("データの取得に失敗しました");
-			}
 			model.addAttribute("centerInfo", centerInfo);
 
 		} catch (Exception e) {
-			//L2出力
-			logger.error(String.format(LogMessage.ERROR_LOG, "GET", "centerUpdate", e));
+			// 例外処理
+			logError(logger, "GET", "centerUpdate-unexpected", e);
+			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
+			return "redirect:" + UrlConsts.CENTER_INFO;
 		}
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerUpdate", "END"));
+		// 終了処理
+		logEnd(logger, "GET", "centerUpdate");
 
 		return "admin/centerInfo/update";
 	}
@@ -243,21 +201,21 @@ public class CenterInfoController extends AbstractController {
 	/**
 	 * 更新内容確認
 	 * 
-	 * @param model
-	 * @param centerInfo
-	 * @return
+	 * @param model 画面のモデルオブジェクト
+	 * @param centerInfo 更新する在庫センター情報 {@link CenterInfo}
+	 * @param bindingResult バインディング結果
+	 * @param redirectAttributes リダイレクト属性
+	 * @return 画面のパス
 	 */
 	@PostMapping(UrlConsts.CENTER_INFO_UPDATE + "/{centerId}")
 	@Transactional
 	public String centerUpdate(Model model, @Valid CenterInfo centerInfo, BindingResult bindingResult,
 			RedirectAttributes redirectAttributes) {
-		// L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		// L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "centerUpdate-transaction", "START"));
+		// 開始処理
+		logStart(logger, "POST", "centerUpdate-transaction");
 
 		try {
-			//入力チェック（バリデーション）
+			// 入力チェック（バリデーション）
 			if (bindingResult.hasFieldErrors()) {
 
 				List<String> errorFields = new ArrayList<>();
@@ -265,23 +223,22 @@ public class CenterInfoController extends AbstractController {
 					// エラーがあるフィールド名をリストに追加
 					errorFields.add(fieldError.getField());
 				}
-				// L2出力
-				logger.error(String.format(LogMessage.ERROR_LOG, "POST", "centerUpdate-ValidError", errorFields));
+				// バリデーションエラー処理
+				logValidationError(logger, "POST", "centerUpdate-ValidError", errorFields.toString());
 				return "admin/centerInfo/update"; // バリデーションエラーがあった場合は登録フォームに戻る
 			}
-
 			// センター情報を更新
 			centerInfoService.updateCenterInfo(centerInfo);
 			// 更新成功メッセージをフラッシュスコープに設定
-			redirectAttributes.addFlashAttribute("successMsg", "センター情報が更新されました。");
+			redirectAttributes.addFlashAttribute("successMsg", centerInfo.getCenterName() + "が更新されました。");
 
 		} catch (Exception e) {
-			// L2出力
-			logger.error(String.format(LogMessage.ERROR_LOG, "POST", "centerRegister-unexpected", e));
-			return "admin/centerInfo/update"; // 例外が発生した場合は登録フォームに戻る
+			// 例外処理
+			logError(logger, "POST", "centerRegister-unexpected", e);
+			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
 		}
-		// L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "centerUpdate-transaction", "END"));
+		// 終了処理
+		logEnd(logger, "POST", "centerUpdate-transaction");
 
 		// 在庫センター情報画面に戻る
 		return "redirect:" + UrlConsts.CENTER_INFO; // 在庫センター情報画面にリダイレクト
@@ -290,76 +247,70 @@ public class CenterInfoController extends AbstractController {
 	/**
 	 * 削除確認画面の表示
 	 * 
-	 * @param model
-	 * @return
+	 * @param centerId センターID
+	 * @param model 画面のモデルオブジェクト
+	 * @param redirectAttributes リダイレクト属性
+	 * @return 画面のパス
 	 */
 	@GetMapping(UrlConsts.CENTER_INFO_DELETE + "/{centerId}")
-	public String centerDelete(@PathVariable Integer centerId, Model model) {
-
-		//L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerDelete", "START"));
+	public String centerDelete(@PathVariable Integer centerId, Model model, RedirectAttributes redirectAttributes) {
+		// 開始処理
+		logStart(logger, "GET", "centerDelete");
 
 		try {
-			//centerIdによって検索取得
+			// centerIdによって検索取得
 			CenterInfo centerInfo = centerInfoService.getCenterInfoData(centerId);
-			//取得に失敗していればエラー
-			if (centerInfo == null) {
-				throw new Exception("データの取得に失敗しました");
-			}
 			model.addAttribute("centerInfo", centerInfo);
 
 		} catch (Exception e) {
-			//L2出力
-			logger.error(String.format(LogMessage.ERROR_LOG, "GET", "centerDelete", e));
+			// 例外処理
+			logError(logger, "GET", "centerDelete-unexpected", e);
+			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
+			return "redirect:" + UrlConsts.CENTER_INFO;
 		}
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerDelete", "END"));
-
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "centerDelete", "END"));
-
+		// 終了処理
+		logEnd(logger, "GET", "centerDelete");
 		return "admin/centerInfo/delete";
 	}
 
 	/**
 	 * 削除内容確認
 	 * 
-	 * @param model
-	 * @param centerInfo
-	 * @return
+	 * @param model 画面のモデルオブジェクト
+	 * @param centerInfo 論理削除する在庫センター情報 {@link CenterInfo}
+	 * @param bindingResult バインディング結果
+	 * @param redirectAttributes リダイレクト属性
+	 * @return 画面のパス
 	 */
 	@PostMapping(UrlConsts.CENTER_INFO_DELETE + "/{centerId}")
 	@Transactional
 	public String centerDelete(Model model, @Valid CenterInfo centerInfo, BindingResult bindingResult,
 			RedirectAttributes redirectAttributes) {
-		// L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		// L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "centerDelete-transaction", "START"));
+		// 開始処理
+		logStart(logger, "POST", "centerDelete-transaction");
 
 		try {
 			if (centerInfoService.isCenterWithStockExists(centerInfo)) {
-				// L2出力
-				logger.error(String.format(LogMessage.ERROR_LOG, "POST", "centerDelete-", "在庫が存在するため削除できません的な"));
+				// エラーメッセージをプロパティファイルから取得
+				String errorMsg = MessageManager.getMessage(messageSource,
+						ErrorMessage.CANNOT_DELETE_CENTER_ERROR_MESSAGE);
+				// バリデーションエラー処理
+				logValidationError(logger, "POST", "centerDelete", errorMsg);
+				// 削除エラーメッセージをフラッシュスコープに設定
+				redirectAttributes.addFlashAttribute("errorMsg", errorMsg);
+			} else {
+				// センター情報を削除する処理
+				centerInfoService.deleteCenterInfo(centerInfo);
 				// 更新成功メッセージをフラッシュスコープに設定
-				redirectAttributes.addFlashAttribute("errorMsg", "※在庫が存在するため削除できません");
-				return "redirect:" + UrlConsts.CENTER_INFO; //在庫センターに戻る
+				redirectAttributes.addFlashAttribute("successMsg", centerInfo.getCenterName() + "が削除されました。");
 			}
-
-			// センター情報を削除する処理
-			centerInfoService.deleteCenterInfo(centerInfo);
-			// 更新成功メッセージをフラッシュスコープに設定
-			redirectAttributes.addFlashAttribute("successMsg", "センター情報が削除されました。");
-
 		} catch (Exception e) {
-			// L2出力
-			logger.error(String.format(LogMessage.ERROR_LOG, "POST", "centerDelete-unexpected", e));
-			return "admin/centerInfo/update"; // 例外が発生した場合は登録フォームに戻る
+			// 例外処理
+			logError(logger, "POST", "centerDelete-unexpected", e);
+			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
 		}
-		// L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "centerDelete-transaction", "END"));
+		// 終了処理
+		logEnd(logger, "POST", "centerDelete-transaction");
 
 		// 在庫センター情報画面に戻る
 		return "redirect:" + UrlConsts.CENTER_INFO; // 在庫センター情報画面にリダイレクト

@@ -8,10 +8,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.digitalojt.web.consts.LogMessage;
+import com.digitalojt.web.consts.ErrorMessage;
 import com.digitalojt.web.consts.UrlConsts;
-import com.digitalojt.web.dto.StockListViewData;
 import com.digitalojt.web.form.StockInfoForm;
 import com.digitalojt.web.service.StockInfoService;
 import com.digitalojt.web.util.MessageManager;
@@ -23,13 +23,12 @@ import lombok.RequiredArgsConstructor;
  * 在庫一覧画面コントローラークラス
  * 
  * @author KaitoDokan
- *
  */
 @Controller
 @RequiredArgsConstructor
 public class StockListController extends AbstractController {
 
-	/*在庫一覧サービス*/
+	/* 在庫一覧サービス */
 	private final StockInfoService stockInfoService;
 
 	/** メッセージソース */
@@ -41,53 +40,43 @@ public class StockListController extends AbstractController {
 	/**
 	 * 初期表示
 	 * 
-	 * @return String(path)
+	 * @param model 画面のモデルオブジェクト
+	 * @param form 在庫一覧の検索条件を含むフォームオブジェクト {@link StockInfoForm}
+	 * @param redirectAttributes リダイレクト属性
+	 * @return 画面のパス
 	 */
 	@GetMapping(UrlConsts.STOCK_LIST)
-	public String stockListView(Model model, StockInfoForm form) {
-
-		//L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "stockListView", "START"));
+	public String stockListView(Model model, StockInfoForm form, RedirectAttributes redirectAttributes) {
+		// 開始処理
+		logStart(logger, "GET", "stockListView");
 
 		try {
-			// 共通データをサービスから取得
-			StockListViewData data = stockInfoService.getStockListViewData(form);
-			//取得に失敗していればエラー
-			if (data == null) {
-				throw new RuntimeException("データの取得に失敗しました");
-			}
-
-			//共通データをmodelにセット
-			stockInfoService.setCommonModelAttributes(model, data);
-
-		} catch (RuntimeException e) {
-			//L2出力
-			logger.error(String.format(LogMessage.ERROR_LOG, "GET", "stockListView", e));
+			stockInfoService.setUpStockListViewData(model, form);
+		} catch (Exception e) {
+			// 例外処理
+			logError(logger, "GET", "stockListView-unexpected", e);
+			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
+			return "redirect:" + UrlConsts.CENTER_INFO;
 		}
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "GET", "stockListView", "END"));
-
+		// 終了処理
+		logEnd(logger, "GET", "stockListView");
 		return "admin/stockList/index";
 	}
 
 	/**
 	 * 検索結果表示
 	 * 
-	 * @param model
-	 * @param form
-	 * @return
+	 * @param model 画面のモデルオブジェクト
+	 * @param form 在庫一覧の検索条件を含むフォームオブジェクト {@link StockInfoForm}
+	 * @param bindingResult バインディング結果
+	 * @param redirectAttributes リダイレクト属性
+	 * @return 画面のパス
 	 */
 	@PostMapping(UrlConsts.STOCK_LIST_SEARCH)
-	public String search(Model model, @Valid StockInfoForm form, BindingResult bindingResult) {
-
-		//L1出力
-		logger.info(String.format(LogMessage.ACCESS_LOG));
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "search", "START"));
-
-		StockListViewData data;
+	public String search(Model model, @Valid StockInfoForm form, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		// 開始処理
+		logStart(logger, "POST", "search");
 		try {
 			// Valid項目チェック
 			if (bindingResult.hasErrors()) {
@@ -95,25 +84,20 @@ public class StockListController extends AbstractController {
 				String errorMsg = MessageManager.getMessage(messageSource,
 						bindingResult.getGlobalError().getDefaultMessage());
 				model.addAttribute("errorMsg", errorMsg);
-				data = stockInfoService.getStockListViewData(new StockInfoForm()); // フォームの入力なしで全件取得
-				//L2出力
-				logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search-ValidError", form));
-				//負の数を入力した場合保持がリセットされる。いい実装がなければ仕様変更
-				//amountに999999999999等入れた場合、nullが返されてしまいバリデーションエラーとならない
+				stockInfoService.setUpStockListViewData(model, new StockInfoForm());
+				model.addAttribute("inputtedValue", form); // フォームの再セット
+				// 例外処理
+				logValidationError(logger, "POST", "search-ValidError", form + errorMsg);
 			} else {
-				//フォームに入力された情報から検索、再セット
-				data = stockInfoService.getStockListViewData(form);
-				data.setSelectStockInfoList(stockInfoService.getStockInfoData(form.getCategoryId()));
+				stockInfoService.setUpStockListViewData(model, form);
 			}
-			//共通データをmodelにセット
-			stockInfoService.setCommonModelAttributes(model, data);
-
 		} catch (Exception e) {
-			//L2出力
-			logger.error(String.format(LogMessage.ERROR_LOG, "POST", "search", e));
+			// 例外処理
+			logError(logger, "POST", "search-unexpected", e);
+			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
 		}
-		//L3出力
-		logger.info(String.format(LogMessage.APP_LOG, "POST", "search", "END"));
+		// 終了処理
+		logEnd(logger, "POST", "search");
 		return "admin/stockList/index";
 	}
 }

@@ -34,11 +34,13 @@
 
 					<label for="searchTerm" class="mr-2">個数(現在)</label>
 					<input type="number" id="searchTerm" name="storageCapacityFrom" class="form-control mr-2"
-						th:value="${inputtedValue.storageCapacityFrom != null ? inputtedValue.storageCapacityFrom : 0}">
+						th:value="${inputtedValue.storageCapacityFrom != null ? inputtedValue.storageCapacityFrom : 0}"
+						required>
 					～
 					<label for="searchTerm" class="mr-2"></label>
 					<input type="number" id="searchTerm" name="storageCapacityTo" class="form-control mr-2"
-						th:value="${inputtedValue.storageCapacityTo != null ? inputtedValue.storageCapacityTo : 99999999}">
+						th:value="${inputtedValue.storageCapacityTo != null ? inputtedValue.storageCapacityTo : 99999999}"
+						required>
 
 					<button type="submit" class="btn btn-primary">検索</button>
 				</form>
@@ -94,7 +96,8 @@
 									th:href="@{'/admin/centerInfo/update/'+${centerInfo.centerId}}">
 									<span>編集</span>
 								</a></td>
-							<td><a class="btn btn-danger" th:href="@{'/admin/centerInfo/delete/'+${centerInfo.centerId}}">
+							<td><a class="btn btn-danger"
+									th:href="@{'/admin/centerInfo/delete/'+${centerInfo.centerId}}">
 									<span>削除</span>
 								</a></td>
 						</tr>

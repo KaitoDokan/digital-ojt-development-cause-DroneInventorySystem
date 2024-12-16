@@ -61,6 +61,7 @@ public class CenterInfo {
 	 * 管理者名
 	 */
 	@Pattern(regexp = "^[^{}=;&$'*? \\(\\)\\\\]*$", message = "{invalid.input}")
+	@Size(min = 1, max = 20, message = "{manager_name.length.input}")
 	private String managerName;
 
 	/**
@@ -86,6 +87,7 @@ public class CenterInfo {
 	 * 備考
 	 */
 	@Pattern(regexp = "^[^{}=;&$'*? \\(\\)\\\\]*$", message = "{invalid.input}")
+	@Size(min = 0, max = 250, message = "{notes.length.input}")
 	private String notes;
 
 	/**

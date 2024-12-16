@@ -63,7 +63,7 @@ public class CenterInfoController extends AbstractController {
 			// 例外処理
 			logError(logger, "GET", "centerListView-unexpected", e);
 			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
-			return "redirect:" + UrlConsts.STOCK_LIST; // ここで予期せぬエラーが出たら在庫リストにリダイレクト
+			return "redirect:" + UrlConsts.ERROR;
 		}
 		// 終了処理
 		logEnd(logger, "GET", "centerListView");
@@ -102,7 +102,7 @@ public class CenterInfoController extends AbstractController {
 			// 例外処理
 			logError(logger, "POST", "search-unexpected", e);
 			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
-			return "redirect:" + UrlConsts.CENTER_INFO;
+			return "redirect:" + UrlConsts.ERROR;
 		}
 		// 終了処理
 		logEnd(logger, "POST", "search");
@@ -138,7 +138,7 @@ public class CenterInfoController extends AbstractController {
 	public String centerRegister(Model model, @Valid CenterInfo centerInfo, BindingResult bindingResult,
 			RedirectAttributes redirectAttributes) {
 		// 開始処理
-		logStart(logger, "POST", "centerRegister");
+		logStart(logger, "POST", "centerRegister-transaction");
 
 		try {
 			// 入力チェック（バリデーション）
@@ -149,7 +149,7 @@ public class CenterInfoController extends AbstractController {
 					errorFields.add(fieldError.getField());
 				}
 				//バリデーションエラー処理
-				logValidationError(logger, "POST", "centerRegister-ValidError", errorFields.toString());
+				logValidationError(logger, "POST", "centerRegister-ValidError", errorFields.toString()+centerInfo);
 				return "admin/centerInfo/register"; // バリデーションエラーがあった場合は登録フォームに戻る
 			}
 			// センター情報を登録
@@ -161,9 +161,10 @@ public class CenterInfoController extends AbstractController {
 			// 例外処理
 			logError(logger, "POST", "centerRegister-unexpected", e);
 			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
+			return "redirect:" + UrlConsts.ERROR;
 		}
 		// 終了処理
-		logEnd(logger, "POST", "centerRegister");
+		logEnd(logger, "POST", "centerRegister-transaction");
 		// 在庫センター情報画面に戻る
 		return "redirect:" + UrlConsts.CENTER_INFO; // 在庫センター情報画面にリダイレクト
 	}
@@ -190,7 +191,7 @@ public class CenterInfoController extends AbstractController {
 			// 例外処理
 			logError(logger, "GET", "centerUpdate-unexpected", e);
 			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
-			return "redirect:" + UrlConsts.CENTER_INFO;
+			return "redirect:" + UrlConsts.ERROR;
 		}
 		// 終了処理
 		logEnd(logger, "GET", "centerUpdate");
@@ -224,7 +225,7 @@ public class CenterInfoController extends AbstractController {
 					errorFields.add(fieldError.getField());
 				}
 				// バリデーションエラー処理
-				logValidationError(logger, "POST", "centerUpdate-ValidError", errorFields.toString());
+				logValidationError(logger, "POST", "centerUpdate-ValidError", errorFields.toString()+centerInfo);
 				return "admin/centerInfo/update"; // バリデーションエラーがあった場合は登録フォームに戻る
 			}
 			// センター情報を更新
@@ -236,6 +237,7 @@ public class CenterInfoController extends AbstractController {
 			// 例外処理
 			logError(logger, "POST", "centerRegister-unexpected", e);
 			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
+			return "redirect:" + UrlConsts.ERROR;
 		}
 		// 終了処理
 		logEnd(logger, "POST", "centerUpdate-transaction");
@@ -266,7 +268,7 @@ public class CenterInfoController extends AbstractController {
 			// 例外処理
 			logError(logger, "GET", "centerDelete-unexpected", e);
 			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
-			return "redirect:" + UrlConsts.CENTER_INFO;
+			return "redirect:" + UrlConsts.ERROR;
 		}
 		// 終了処理
 		logEnd(logger, "GET", "centerDelete");
@@ -308,6 +310,7 @@ public class CenterInfoController extends AbstractController {
 			// 例外処理
 			logError(logger, "POST", "centerDelete-unexpected", e);
 			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
+			return "redirect:" + UrlConsts.ERROR;
 		}
 		// 終了処理
 		logEnd(logger, "POST", "centerDelete-transaction");

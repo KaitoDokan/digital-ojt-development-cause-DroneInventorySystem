@@ -11,6 +11,9 @@ public class UrlConsts {
 	// ログイン
 	public static final String LOGIN = "/login";
 
+	// エラー
+	public static final String ERROR = "/admin/error";
+
 	// 認証
 	public static final String AUTHENTICATE = "/authenticate";
 
@@ -28,10 +31,10 @@ public class UrlConsts {
 
 	// 在庫センター情報画面 登録
 	public static final String CENTER_INFO_REGISTER = "/admin/centerInfo/register";
-	
+
 	// 在庫センター情報画面 更新
 	public static final String CENTER_INFO_UPDATE = "/admin/centerInfo/update";
-	
+
 	// 在庫センター情報画面 削除
 	public static final String CENTER_INFO_DELETE = "/admin/centerInfo/delete";
 

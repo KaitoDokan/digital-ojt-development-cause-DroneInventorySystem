@@ -52,11 +52,12 @@ public class StockListController extends AbstractController {
 
 		try {
 			stockInfoService.setUpStockListViewData(model, form);
+
 		} catch (Exception e) {
 			// 例外処理
 			logError(logger, "GET", "stockListView-unexpected", e);
 			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
-			return "redirect:" + UrlConsts.CENTER_INFO;
+			return "redirect:" + UrlConsts.ERROR;
 		}
 		// 終了処理
 		logEnd(logger, "GET", "stockListView");
@@ -95,6 +96,7 @@ public class StockListController extends AbstractController {
 			// 例外処理
 			logError(logger, "POST", "search-unexpected", e);
 			setFlashErrorMsg(messageSource, redirectAttributes, ErrorMessage.UNEXPECTED_INPUT_ERROR_MESSAGE);
+			return "redirect:" + UrlConsts.ERROR;
 		}
 		// 終了処理
 		logEnd(logger, "POST", "search");

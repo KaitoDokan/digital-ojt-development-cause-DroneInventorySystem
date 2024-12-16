@@ -100,7 +100,7 @@ public class CenterInfoFormValidatorImpl implements ConstraintValidator<CenterIn
 	private boolean areAllFieldsEmpty(CenterInfoForm form) {
 		return (form.getCenterName().isEmpty()) &&
 				(form.getRegion().isEmpty()) &&
-				((form.getStorageCapacityFrom() == null) && (form.getStorageCapacityTo() == null));
+				((form.getStorageCapacityFrom() == null) | (form.getStorageCapacityTo() == null));
 	}
 
 	private void setErrorMessage(ConstraintValidatorContext context, String errorMessage) {

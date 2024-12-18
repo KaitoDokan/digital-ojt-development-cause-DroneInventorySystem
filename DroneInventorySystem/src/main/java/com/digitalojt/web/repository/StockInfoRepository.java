@@ -18,7 +18,9 @@ import com.digitalojt.web.entity.StockInfo;
 @Repository
 public interface StockInfoRepository extends JpaRepository<StockInfo, Integer> {
 
-	@Query("SELECT s FROM StockInfo s WHERE s.deleteFlag = '0'")
+	@Query("SELECT s FROM StockInfo s " +
+			"WHERE s.deleteFlag = '0' " +
+			"ORDER BY s.categoryInfo.categoryId ASC, s.amount DESC")
 	List<StockInfo> findAll();//全件取得
 
 	/**
@@ -36,7 +38,8 @@ public interface StockInfoRepository extends JpaRepository<StockInfo, Integer> {
 			"AND (:amount IS NULL OR " +
 			"     (:isAboveOrBelowFlag = 0 AND s.amount >= :amount) OR " +
 			"     (:isAboveOrBelowFlag = 1 AND s.amount <= :amount)) " +
-			"AND s.deleteFlag = '0'")
+			"AND s.deleteFlag = '0' " +
+			"ORDER BY s.categoryInfo.categoryId ASC, s.amount DESC")
 	List<StockInfo> findByCategoryIdAndStockNameAndAmount(
 			Integer categoryId,
 			String stockName,
@@ -50,7 +53,7 @@ public interface StockInfoRepository extends JpaRepository<StockInfo, Integer> {
 	 * @return paramで検索した結果
 	 */
 	List<StockInfo> findByCategoryInfo_CategoryId(Integer categoryId);
-	
+
 	/**
 	 * 引数に合致する在庫情報を取得
 	 * 

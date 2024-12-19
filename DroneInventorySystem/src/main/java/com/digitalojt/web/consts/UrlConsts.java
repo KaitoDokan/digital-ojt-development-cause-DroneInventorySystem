@@ -43,6 +43,9 @@ public class UrlConsts {
 
 	// 分類情報画面 検索
 	public static final String CATEGORY_INFO_SEARCH = "/admin/categoryInfo/search";
+	
+	// 操作履歴画面
+	public static final String  OPERATION_LOG = "/admin/operationLog";
 
 	// 認証不要画面
 	public static final String[] NO_AUTHENTICATION = { LOGIN, AUTHENTICATE };
